@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2015-12-03T22:23:25Z</date>
+		<key>munki_version</key>
+		<string>2.4.0.2561</string>
+		<key>os_version</key>
+		<string>10.11.1</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+		<string>production</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>description</key>
+	<string>Shows at login screen the list of available users, except hidden users.</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>Show User List</string>
+	<key>installcheck_script</key>
+	<string>#!/bin/bash
+
+testVariable=$(defaults read /Library/Preferences/com.apple.loginwindow.plist SHOWFULLNAME)
+
+if [ "$testVariable" == "1" ]; then
+
+	# Not installed
+	exit 0
+else
+	# Is installed
+	exit 1
+fi</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>ShowUserList</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/bash
+
+# Show the list of users instead of the name and password
+sudo defaults write /Library/Preferences/com.apple.loginwindow SHOWFULLNAME -bool FALSE</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>unattended_uninstall</key>
+	<true/>
+	<key>uninstall_method</key>
+	<string>uninstall_script</string>
+	<key>uninstall_script</key>
+	<string>#!/bin/bash
+
+# Show the list of users instead of the name and password
+sudo defaults write /Library/Preferences/com.apple.loginwindow SHOWFULLNAME -bool TRUE</string>
+	<key>uninstallable</key>
+	<true/>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
