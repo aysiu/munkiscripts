@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2015-12-03T20:55:10Z</date>
+		<key>munki_version</key>
+		<string>2.4.0.2561</string>
+		<key>os_version</key>
+		<string>10.11.1</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+		<string>production</string>
+	</array>
+	<key>category</key>
+	<string>Security</string>
+	<key>description</key>
+	<string>Changes Security &amp; Privacy setting to allow apps downloaded from anywhere.</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>Allow Apps from Anywhere</string>
+	<key>installcheck_script</key>
+	<string>#!/bin/bash
+
+# Hold the output of the command to get the status
+testVariable=$(spctl --status)
+
+# See if the output is enabled
+if [ "$testVariable" == "assessments enabled" ]; then
+	# If so, the nopkg is not installed
+	exit 0
+else
+	# If not, the nopkg is installed
+	exit 1
+fi</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>SecurityAllowAppsFromAnywhere</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/bash
+
+# Allow apps from anywhere
+sudo spctl --master-disable</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>unattended_uninstall</key>
+	<true/>
+	<key>uninstall_method</key>
+	<string>uninstall_script</string>
+	<key>uninstall_script</key>
+	<string>#!/bin/bash
+
+# Allow apps from anywhere
+sudo spctl --master-enable</string>
+	<key>uninstallable</key>
+	<true/>
+	<key>version</key>
+	<string>1.1</string>
+</dict>
+</plist>
