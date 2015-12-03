@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2015-12-03T18:56:13Z</date>
+		<key>munki_version</key>
+		<string>2.4.0.2561</string>
+		<key>os_version</key>
+		<string>10.11.1</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+		<string>production</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>description</key>
+	<string>Allows users to resume printers or print jobs without being an administrator.</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>Printer Allow Resume</string>
+	<key>installcheck_script</key>
+	<string>#!/bin/bash
+
+# Exit 0 means not installed
+# Exit 1 means installed
+
+# See if the cupsd.conf file contains the word "Resume-"
+testValue=$(grep "Resume-" /etc/cups/cupsd.conf)
+
+# See if the value is empty
+if [ -z $testValue ]; then
+	exit 1
+else
+	exit 0
+fi</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>PrinterAllowResume</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/bash
+
+# First, temporarily disable the CUPS service
+sudo launchctl unload -w /System/Library/LaunchDaemons/org.cups.cupsd.plist
+
+# Back up the file with the current timestamp, and do a find/replace "Resume-Printer " and "Resume-Job "
+#sudo sed -i.bak$(date +%Y%m%d%H%M%S) -e s/"Resume-Job "/""/g -e s/"Resume-Printer "/""/g /etc/cups/cupsd.conf
+sudo sed -i.AllowResumebak -e s/"Resume-Job "/""/g -e s/"Resume-Printer "/""/g /etc/cups/cupsd.conf
+
+# Re-enable the CUPS service
+sudo launchctl load -w /System/Library/LaunchDaemons/org.cups.cupsd.plist</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>unattended_uninstall</key>
+	<true/>
+	<key>uninstall_method</key>
+	<string>uninstall_script</string>
+	<key>uninstall_script</key>
+	<string>#!/bin/bash
+
+# First, temporarily disable the CUPS service
+sudo launchctl unload -w /System/Library/LaunchDaemons/org.cups.cupsd.plist
+
+# Double-check the backup exists
+if [ -f /etc/cups/cupsd.conf.AllowResumebak ] &amp;&amp; [ -f /etc/cups/cupsd.conf ]; then
+
+	# Delete the current
+	sudo rm /etc/cups/cupsd.conf
+
+	# Rename the backup
+	sudo mv /etc/cups/cupsd.conf.AllowResumebak /etc/cups/cupsd.conf
+
+fi
+
+# Re-enable the CUPS service
+sudo launchctl load -w /System/Library/LaunchDaemons/org.cups.cupsd.plist</string>
+	<key>uninstallable</key>
+	<true/>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
