@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2015-12-22T18:52:58Z</date>
+		<key>munki_version</key>
+		<string>2.4.0.2561</string>
+		<key>os_version</key>
+		<string>10.11.2</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>installcheck_script</key>
+	<string>#!/bin/bash
+
+# Create a variable to store the output of the current preferences
+testVariable=$(defaults read /Library/Preferences/.GlobalPreferences.plist com.apple.autologout.AutoLogOutDelay)
+
+# If it's never been set, the output will be "The domain/default pair of (/Library/Preferences/.GlobalPreferences.plist, com.apple.autologout.AutoLogOutDelay) does not exist"
+# If it's been set and then turned off again, the output will be "0"
+# Otherwise, it will be the number of seconds before a logout of the current user is attempted
+
+######## If you want to change the timeout, change it here ############
+# We want, in this case, for it to be set to 300 seconds (5 minutes)
+if [ "$testVariable" == "300" ]; then
+
+	# It's set, so let's exit with 1
+	exit 1	
+
+else
+
+	# It's not set, so let's exit with 0
+	exit 0
+	
+fi</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>AutoLogOut</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/bash
+
+# Set the autologout to 5 minutes (or 300 seconds):
+######## If you want to change the timeout, change it here, too ############
+sudo defaults write /Library/Preferences/.GlobalPreferences.plist com.apple.autologout.AutoLogOutDelay -int 300</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>uninstall_method</key>
+	<string>uninstall_script</string>
+	<key>uninstall_script</key>
+	<string>#!/bin/bash
+
+# Set the autologout to 5 minutes (or 300 seconds):
+sudo defaults write /Library/Preferences/.GlobalPreferences.plist com.apple.autologout.AutoLogOutDelay -int 0</string>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
+
