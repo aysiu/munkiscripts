@@ -19,6 +19,10 @@
 	<array>
 		<string>testing</string>
 	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>developer</key>
+	<string>aysiu</string>
 	<key>installcheck_script</key>
 	<string>#!/bin/bash
 
@@ -56,6 +60,8 @@ fi</string>
 sudo defaults write /Library/Preferences/.GlobalPreferences.plist com.apple.autologout.AutoLogOutDelay -int 300</string>
 	<key>unattended_install</key>
 	<true/>
+	<key>unattended_uninstall</key>
+	<true/>
 	<key>uninstall_method</key>
 	<string>uninstall_script</string>
 	<key>uninstall_script</key>
@@ -63,8 +69,9 @@ sudo defaults write /Library/Preferences/.GlobalPreferences.plist com.apple.auto
 
 # Set the autologout to 5 minutes (or 300 seconds):
 sudo defaults write /Library/Preferences/.GlobalPreferences.plist com.apple.autologout.AutoLogOutDelay -int 0</string>
+	<key>uninstallable</key>
+	<true/>
 	<key>version</key>
 	<string>1.0</string>
 </dict>
 </plist>
-
