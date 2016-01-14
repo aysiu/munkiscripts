@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2016-01-14T17:43:16Z</date>
+		<key>munki_version</key>
+		<string>2.4.0.2561</string>
+		<key>os_version</key>
+		<string>10.11.2</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>description</key>
+	<string>Disables Java's auto-update check from bothering users</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>Disable Java Auto Updates</string>
+	<key>installcheck_script</key>
+	<string>#!/bin/bash
+
+# Set up test variable
+testVariable=$(defaults read /Library/Preferences/com.oracle.java.Java-Updater JavaAutoUpdateEnabled)
+
+# See if it's disabled
+if [ "$testVariable" == "0" ]; then
+
+	# It's installed (meaning Java auto-updates checks are disabled)
+	exit 1
+
+else
+
+	# It's not installed (meaning Java auto-update checks are enabled)
+	exit 0
+
+fi</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>DisableJavaAutoUpdates</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/bash
+sudo defaults write /Library/Preferences/com.oracle.java.Java-Updater JavaAutoUpdateEnabled -bool false</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>unattended_uninstall</key>
+	<true/>
+	<key>uninstall_method</key>
+	<string>uninstall_script</string>
+	<key>uninstall_script</key>
+	<string>#!/bin/bash
+sudo defaults write /Library/Preferences/com.oracle.java.Java-Updater JavaAutoUpdateEnabled -bool true</string>
+	<key>uninstallable</key>
+	<true/>
+	<key>update_for</key>
+	<array>
+		<string>OracleJava8</string>
+	</array>
+	<key>version</key>
+	<string>1.2</string>
+</dict>
+</plist>
