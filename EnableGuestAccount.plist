@@ -53,6 +53,9 @@ fi</string>
 ## Unfortunately, this only cosmetically changes what shows in System Preferences. It does not actually enable the guest account.
 ## I have to figure out what goes on behind the scenes.
 sudo defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -bool TRUE
+## Not helpful in terms of fully scripting, but if you're willing to do a payload, you can make one copy of the
+##/private/var/db/dslocal/nodes/Default/users/Guest.plist file and distribute out to the client machine, and that should enable the
+## account again.
 </string>
 	<key>unattended_install</key>
 	<true/>
