@@ -50,6 +50,8 @@ fi</string>
 	<string>#!/bin/bash
 
 # Enable the guest account
+## Unfortunately, this only cosmetically changes what shows in System Preferences. It does not actually enable the guest account.
+## I have to figure out what goes on behind the scenes.
 sudo defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -bool TRUE
 </string>
 	<key>unattended_install</key>
@@ -62,7 +64,10 @@ sudo defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -boo
 	<string>#!/bin/bash
 
 # Disable the guest account
-sudo defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -bool FALSE</string>
+## This changes cosmetically what shows up in System Preferences
+sudo defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -bool FALSE
+## This actually disables the guest account from being able to log in
+sudo rm /private/var/db/dslocal/nodes/Default/users/Guest.plist</string>
 	<key>uninstallable</key>
 	<true/>
 	<key>version</key>
