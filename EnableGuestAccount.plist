@@ -5,13 +5,13 @@
 	<key>_metadata</key>
 	<dict>
 		<key>created_by</key>
-		<string>aysiu</string>
+		<string>alan</string>
 		<key>creation_date</key>
-		<date>2015-12-03T22:22:05Z</date>
+		<date>2016-01-27T20:03:40Z</date>
 		<key>munki_version</key>
 		<string>2.4.0.2561</string>
 		<key>os_version</key>
-		<string>10.11.1</string>
+		<string>10.11.3</string>
 	</dict>
 	<key>autoremove</key>
 	<false/>
@@ -22,24 +22,29 @@
 	<key>category</key>
 	<string>Scripts</string>
 	<key>description</key>
-	<string>Enables the guest account for login.</string>
+	<string>Enables the guest account.</string>
 	<key>developer</key>
-	<string>aysiu</string>
+	<string>sheagcraig</string>
 	<key>display_name</key>
 	<string>Enable Guest Account</string>
 	<key>installcheck_script</key>
 	<string>#!/bin/bash
 
-testVariable=$(defaults read /Library/Preferences/com.apple.loginwindow.plist GuestEnabled)
+# Totally written by sheagcraig... just cut up for a Munki nopkg .plist
+# Original code at https://github.com/sheagcraig/guestAccount/blob/master/guest_account
+# Taking out all the if/then stuff, because we aren't running anything close to Lion on campus
 
-if [ "$testVariable" == "1" ]; then
-
-	# Installed
+# Does guest already exist?
+if [ -f /var/db/dslocal/nodes/Default/users/Guest.plist ]; then
+	#echo "Guest already created!"
 	exit 1
-else
-	# Is not installed
+	
+	else
+	# Guest not created
 	exit 0
-fi</string>
+
+fi
+</string>
 	<key>installer_type</key>
 	<string>nopkg</string>
 	<key>minimum_os_version</key>
@@ -49,31 +54,54 @@ fi</string>
 	<key>postinstall_script</key>
 	<string>#!/bin/bash
 
-# Enable the guest account
-## Unfortunately, this only cosmetically changes what shows in System Preferences. It does not actually enable the guest account.
-## I have to figure out what goes on behind the scenes.
-sudo defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -bool TRUE
-## Not helpful in terms of fully scripting, but if you're willing to do a payload, you can make one copy of the
-##/private/var/db/dslocal/nodes/Default/users/Guest.plist file and distribute out to the client machine, and that should enable the
-## account again.
-</string>
+# Totally written by sheagcraig... just cut up for a Munki nopkg .plist
+# Original code at https://github.com/sheagcraig/guestAccount/blob/master/guest_account
+# Taking out all the if/then stuff, because we aren't running anything close to Lion on campus
+
+/usr/bin/dscl . -create /Users/Guest
+/usr/bin/dscl . -create /Users/Guest dsAttrTypeNative:_defaultLanguage en
+/usr/bin/dscl . -create /Users/Guest dsAttrTypeNative:_guest true
+/usr/bin/dscl . -create /Users/Guest dsAttrTypeNative:_writers__defaultLanguage Guest
+/usr/bin/dscl . -create /Users/Guest dsAttrTypeNative:_writers__LinkedIdentity Guest
+/usr/bin/dscl . -create /Users/Guest dsAttrTypeNative:_writers__UserCertificate Guest
+/usr/bin/dscl . -create /Users/Guest AuthenticationHint ''
+/usr/bin/dscl . -create /Users/Guest NFSHomeDirectory /Users/Guest
+
+# Give a little extra time for the password and kerberos to play nicely
+sleep 2
+/usr/bin/dscl . -passwd /Users/Guest ''
+sleep 2
+
+/usr/bin/dscl . -create /Users/Guest Picture "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/UserIcon.icns"
+/usr/bin/dscl . -create /Users/Guest PrimaryGroupID 201
+/usr/bin/dscl . -create /Users/Guest RealName "Guest User"
+/usr/bin/dscl . -create /Users/Guest RecordName Guest
+/usr/bin/dscl . -create /Users/Guest UniqueID 201
+/usr/bin/dscl . -create /Users/Guest UserShell /bin/bash
+/usr/bin/security add-generic-password -a Guest -s com.apple.loginwindow.guest-account -D "application password" /Library/Keychains/System.keychain
+			
+# This seems to be technically unnecessary; it controls whether the "Allow 
+# guests to log in to this computer" checkbox is enabled in SysPrefs 
+defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -bool TRUE</string>
 	<key>unattended_install</key>
-	<true/>
-	<key>unattended_uninstall</key>
 	<true/>
 	<key>uninstall_method</key>
 	<string>uninstall_script</string>
 	<key>uninstall_script</key>
 	<string>#!/bin/bash
 
-# Disable the guest account
-## This changes cosmetically what shows up in System Preferences
-sudo defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -bool FALSE
-## This actually disables the guest account from being able to log in
-sudo rm /private/var/db/dslocal/nodes/Default/users/Guest.plist</string>
+# Totally written by sheagcraig... just cut up for a Munki nopkg .plist
+# Original code at https://github.com/sheagcraig/guestAccount/blob/master/guest_account
+# Taking out all the if/then stuff, because we aren't running anything close to Lion on campus
+
+/usr/bin/dscl . -delete /Users/Guest
+/usr/bin/security delete-generic-password -a Guest -s com.apple.loginwindow.guest-account -D "application password" /Library/Keychains/System.keychain
+
+# Also-do we need this still? (Should un-tick the box)
+defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -bool FALSE</string>
 	<key>uninstallable</key>
 	<true/>
 	<key>version</key>
-	<string>1.1</string>
+	<string>1.3</string>
 </dict>
 </plist>
