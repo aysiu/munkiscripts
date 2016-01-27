@@ -78,7 +78,11 @@ sleep 2
 /usr/bin/dscl . -create /Users/Guest RecordName Guest
 /usr/bin/dscl . -create /Users/Guest UniqueID 201
 /usr/bin/dscl . -create /Users/Guest UserShell /bin/bash
-/usr/bin/security add-generic-password -a Guest -s com.apple.loginwindow.guest-account -D "application password" /Library/Keychains/System.keychain
+# Commenting out, because this line causes a keychain error when logging in
+# The side effect of commenting out is that you have to enter an empty password (just hit Enter) instead of clicking the icon
+# and then just logging in right away
+# Full credit for that workaround to https://jamfnation.jamfsoftware.com/discussion.html?id=9737#responseChild80750
+#/usr/bin/security add-generic-password -a Guest -s com.apple.loginwindow.guest-account -D "application password" /Library/Keychains/System.keychain
 			
 # This seems to be technically unnecessary; it controls whether the "Allow 
 # guests to log in to this computer" checkbox is enabled in SysPrefs 
