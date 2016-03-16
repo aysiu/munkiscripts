@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2016-03-16T21:18:34Z</date>
+		<key>munki_version</key>
+		<string>2.5.1.2634</string>
+		<key>os_version</key>
+		<string>10.11.3</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>description</key>
+	<string>Turns printer sharing off.</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>Printer Sharing Off</string>
+	<key>installcheck_script</key>
+	<string>#!/bin/bash
+
+
+testVariable=$(cupsctl | grep "_share_printers=1")
+
+if [ -z "$testVariable" ]; then
+
+   # Installed
+   exit 1
+   
+else
+
+   # Not installed
+   exit 0
+
+fi</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>PrinterSharingOff</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/bash
+
+# Turn off printer sharing
+cupsctl --no-share-printers</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>uninstall_method</key>
+	<string>uninstall_script</string>
+	<key>uninstall_script</key>
+	<string>#!/bin/bash
+
+# Turn on printer sharing
+cupsctl --share-printers</string>
+	<key>uninstallable</key>
+	<true/>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
