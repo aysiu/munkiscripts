@@ -26,25 +26,37 @@
 	<key>installcheck_script</key>
 	<string>#!/bin/bash
 
-# Create a variable to store the output of the current preferences
-testVariable=$(defaults read /Library/Preferences/.GlobalPreferences.plist com.apple.autologout.AutoLogOutDelay)
+# Create a variable to see if the preference even exists
+testVariableOne=$(defaults read /Library/Preferences/.GlobalPreferences.plist | grep "com.apple.autologout.AutoLogOutDelay")
 
-# If it's never been set, the output will be "The domain/default pair of (/Library/Preferences/.GlobalPreferences.plist, com.apple.autologout.AutoLogOutDelay) does not exist"
-# If it's been set and then turned off again, the output will be "0"
-# Otherwise, it will be the number of seconds before a logout of the current user is attempted
+# Check if the key exists at all
+if [ -z "$testVariableOne" ]; then
 
-######## If you want to change the timeout, change it here ############
-# We want, in this case, for it to be set to 300 seconds (5 minutes)
-if [ "$testVariable" == "300" ]; then
-
-	# It's set, so let's exit with 1
-	exit 1	
+	# Not installed, since the key doesn't exist
+	exit 0
 
 else
 
-	# It's not set, so let's exit with 0
-	exit 0
+	# Create a variable to store the output of the current preferences
+	testVariableTwo=$(defaults read /Library/Preferences/.GlobalPreferences.plist com.apple.autologout.AutoLogOutDelay)
+
+	# If it's never been set, the output will be "The domain/default pair of (/Library/Preferences/.GlobalPreferences.plist, com.apple.autologout.AutoLogOutDelay) does not exist"
+	# If it's been set and then turned off again, the output will be "0"
+	# Otherwise, it will be the number of seconds before a logout of the current user is attempted
+
+	######## If you want to change the timeout, change it here ############
+	# We want, in this case, for it to be set to 300 seconds (5 minutes)
+	if [ "$testVariable" == "300" ]; then
+
+		# It's set, so let's exit with 1
+		exit 1	
+
+	else
+
+		# It's not set, so let's exit with 0
+		exit 0
 	
+	fi
 fi</string>
 	<key>installer_type</key>
 	<string>nopkg</string>
