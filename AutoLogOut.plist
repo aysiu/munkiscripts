@@ -46,7 +46,7 @@ else
 
 	######## If you want to change the timeout, change it here ############
 	# We want, in this case, for it to be set to 300 seconds (5 minutes)
-	if [ "$testVariable" == "300" ]; then
+	if [ "$testVariableTwo" == "300" ]; then
 
 		# It's set, so let's exit with 1
 		exit 1	
