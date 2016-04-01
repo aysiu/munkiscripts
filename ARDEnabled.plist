@@ -38,6 +38,7 @@ ARDRunning=$(ps aux | grep "[A]RDAgent.app")
 if [ -z "$ARDRunning" ]; then
 
    # It's not installed
+   echo "ARD is not running"
    exit 0
 
 else
@@ -53,6 +54,7 @@ else
    if [ -z "$ARDUser" ] || [ "$ARDUserCount" -ne 1 ] || [ "$ARDAllUsers" -eq 1 ]; then
    
       # It's not installed
+      echo "Users are wrong $ARDUser $ARDUserCount $ARDAllUsers"
       exit 0
    
    else
@@ -72,8 +74,10 @@ fi</string>
 	<key>postinstall_script</key>
 	<string>#!/bin/bash
 # Take off any existing users
-sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -configure -access -off
-
+    RemoteManagementUsers=$(dscl . list /Users naprivs | awk '{print $1}')
+        for EnabledUser in $RemoteManagementUsers; do
+            dscl . delete /Users/$EnabledUser naprivs
+        done
 # Activate ARD for the FILLINTHEBLANK user
 sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -activate -configure -access -on -users FILLINTHEBLANK -privs -all -restart -agent -menu</string>
 	<key>unattended_install</key>
