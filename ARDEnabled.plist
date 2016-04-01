@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2016-04-01T22:18:08Z</date>
+		<key>munki_version</key>
+		<string>2.5.1.2634</string>
+		<key>os_version</key>
+		<string>10.11.4</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>description</key>
+	<string>Checks to see if Remote Management is enabled and for the correct user</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>ARD Enabled</string>
+	<key>installcheck_script</key>
+	<string>#!/bin/bash
+
+# Caveat: This isn't a 100% complete check, because all it does is check whether ARD is running or not and for which users, but it doesn't check if the user has total control. Still... probably good enough for now.
+
+# See if ARDAgent is running
+ARDRunning=$(ps aux | grep "[A]RDAgent.app")
+
+if [ -z "$ARDRunning" ]; then
+
+   # It's not installed
+   exit 0
+
+else
+   # Check that all users is not enabled
+   ARDAllUsers=$(defaults read /Library/Preferences/com.apple.RemoteManagement ARD_AllLocalUsers)
+
+   # Check number of users enabled
+   ARDUserCount=$(dscl . -list /Users naprivs | wc -l)
+
+   # Check that the right user is enabled
+   ARDUser=$(dscl . -list /Users naprivs | grep "FILLINTHEBLANK")
+   
+   if [ -z "$ARDUser" ] || [ "$ARDUserCount" -ne 1 ] || [ "$ARDAllUsers" -eq 1 ]; then
+   
+      # It's not installed
+      exit 0
+   
+   else
+
+      # It is installed
+      exit 1
+   
+   fi
+
+fi</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>ARDEnabled</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/bash
+# Take off any existing users
+sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -configure -access -off
+
+# Activate ARD for the FILLINTHEBLANK user
+sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -activate -configure -access -on -users FILLINTHEBLANK -privs -all -restart -agent -menu</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>unattended_uninstall</key>
+	<true/>
+	<key>uninstall_method</key>
+	<string>uninstall_script</string>
+	<key>uninstall_script</key>
+	<string>#!/bin/bash
+
+# Stop ARD
+sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -agent -stop</string>
+	<key>uninstallable</key>
+	<true/>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
