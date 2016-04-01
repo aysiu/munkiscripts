@@ -75,9 +75,11 @@ fi</string>
 	<string>#!/bin/bash
 # Take off any existing users
     RemoteManagementUsers=$(dscl . list /Users naprivs | awk '{print $1}')
-        for EnabledUser in $RemoteManagementUsers; do
-            dscl . delete /Users/$EnabledUser naprivs
-        done
+        if [ ! -z "$RemoteManagementUsers" ]; then
+        	for EnabledUser in $RemoteManagementUsers; do
+            	sudo dscl . delete /Users/$EnabledUser naprivs
+        	done
+        fi
 # Activate ARD for the FILLINTHEBLANK user
 sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -activate -configure -access -on -users FILLINTHEBLANK -privs -all -restart -agent -menu</string>
 	<key>unattended_install</key>
