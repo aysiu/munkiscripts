@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 ### More details here on how to implement: https://github.com/munki/munki/wiki/Conditional-Items#admin-provided-conditions
+## This should go in /usr/local/munki/conditions and be marked executable
 
 from Foundation import CFPreferencesCopyAppValue
 import os
@@ -8,7 +9,7 @@ import plistlib
 import subprocess
 
 ## Put in the address of your Munki server
-MunkiServer="munkified.siprep.org"
+MunkiServer="your.munki.server.com"
 
 # Read the location of the ManagedInstallDir from ManagedInstall.plist
 BUNDLE_ID = 'ManagedInstalls'
