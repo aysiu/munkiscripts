@@ -2,6 +2,8 @@
 
 ### More details here on how to implement: https://github.com/munki/munki/wiki/Conditional-Items#admin-provided-conditions
 ## This should go in /usr/local/munki/conditions and be marked executable
+## On the manifest, the condition would look like connection_speed < 3.000
+## May rename this later to be ping_time, which makes more logical sense than connection_speed
 
 from Foundation import CFPreferencesCopyAppValue
 import os
@@ -21,8 +23,8 @@ conditionalitemspath = os.path.join(managedinstalldir, 'ConditionalItems.plist')
 
 def getConnectionSpeed():
 
-   ## By default, define a connection speed, in case we don't define one later
-   ConnectionSpeed=0.000
+   ## By default, define a connection speed, in case we don't define one later... since a lower "speed" (ping time, really) is faster, we'll default to it be unusually high
+   ConnectionSpeed=1000.000
 
    ## Test the connection speed
    cmd='ping -c 5 ' + MunkiServer + ' | awk -F "time=" \'{ print $2 }\' | sed s/\'ms\'/\'\'/g'
