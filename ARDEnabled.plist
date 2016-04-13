@@ -73,6 +73,9 @@ fi</string>
 	<string>ARDEnabled</string>
 	<key>postinstall_script</key>
 	<string>#!/bin/bash
+# Make sure it's not enabled for all users
+sudo defaults write /Library/Preferences/com.apple.RemoteManagement ARD_AllLocalUsers -bool FALSE
+
 # Take off any existing users
     RemoteManagementUsers=$(dscl . list /Users naprivs | awk '{print $1}')
         if [ ! -z "$RemoteManagementUsers" ]; then
