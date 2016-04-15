@@ -86,6 +86,8 @@ fi</string>
 	<string>Remove Temp Wireless</string>
 	<key>developer</key>
 	<string>aysiu</string>
+	<key>category</key>
+	<string>Scripts</string>
 	<key>postinstall_script</key>
 	<string>#!/bin/bash
 
