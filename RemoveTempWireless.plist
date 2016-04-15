@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2016-04-15T22:50:23Z</date>
+		<key>munki_version</key>
+		<string>2.6.1.2684</string>
+		<key>os_version</key>
+		<string>10.11.4</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>installcheck_script</key>
+	<string>#!/bin/bash
+
+# Temporary SSID
+tempSSID='SSIDYOUWANTREMOVEDAFTERMUNKIBOOTSTRAPISDONE'
+
+# First, let's make sure the Munki bootstrap file doesn't exist
+munkiBootstrap='/Users/Shared/.com.googlecode.munki.checkandinstallatstartup'
+
+# Munki bootstrap exists.
+if [ -f "$munkiBootstrap" ]; then
+
+   # "Installed" because we won't remove the tempSSID if bootstrap file exists
+   exit 1
+
+# Munki bootstrap does not exist
+else
+
+   # Find the wireless network hardware port name
+   # Code to get next line after "Wi-Fi" is from http://superuser.com/a/298125
+   # Code to get only the text after "Device: " is from http://unix.stackexchange.com/a/24151
+   wifiport=$(networksetup -listallhardwareports | grep -A1 "Wi-Fi" | sed -n -e 's/^.*Device: //p')
+
+	# If it's not empty...
+	if [ ! -z "$wifiport" ]; then 
+
+      # See if tempSSID is in the preferred networks
+      tempInPreferred=$(networksetup -listpreferredwirelessnetworks "$wifiport" | grep "$tempSSID")
+
+      # Temp wireless is in the preferred list
+      if [ ! -z "$tempInPreferred" ]; then
+         
+         # If the temp wireless exists, mark as uninstalled, because we have to remove that temp wireless
+         exit 0
+		
+		# Temp wireless not in the preferred networks
+		else
+
+         # "Installed"
+         exit 1
+		
+		# End checking for temp in preferred
+		fi
+
+   # Wireless can't be determined
+	else
+
+      # Sort of "installed," since we can't determine wireless, no point in "installing," because you can't remove the wireless network anyway
+      exit 1
+
+   # End checking for wifi interface
+	fi
+
+# End checking for Munki bootstrap
+fi</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>RemoveTempWireless</string>
+	<key>description</key>
+	<string>Checks to see if Munki bootstrap file exists. If it doesn't, tries to disconnect from a temporary wireless network.</string>
+	<key>display_name</key>
+	<string>Remove Temp Wireless</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/bash
+
+# Temporary SSID
+tempSSID='SSIDYOUWANTREMOVEDAFTERMUNKIBOOTSTRAPISDONE'
+
+# Find the wireless network hardware port name
+# Code to get next line after "Wi-Fi" is from http://superuser.com/a/298125
+# Code to get only the text after "Device: " is from http://unix.stackexchange.com/a/24151
+wifiport=$(networksetup -listallhardwareports | grep -A1 "Wi-Fi" | sed -n -e 's/^.*Device: //p')
+
+# Remove the temporary SSID
+networksetup -removepreferredwirelessnetwork "$wifiport" "$tempSSID"
+
+# This removes the tempSSID from the list of favorites, but it doesn't disconnect you from that network
+# /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -z will disconnect from any connected network, but then you'll have to manually connect to another favorite network.
+
+# Toggle wireless to just have an automatic scan and reconnect to a remaining favorite
+networksetup -setairportpower "$wifiport" off &amp;&amp; sleep 3 &amp;&amp; networksetup -setairportpower "$wifiport" on</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
+
