@@ -64,10 +64,18 @@ AUTH=$( defaults read /var/root/Library/Preferences/ManagedInstalls.plist Additi
 CURL="/usr/bin/curl"
 
 $CURL --max-time 5 --silent --get \
-    --data-urlencode "hostname=${HOSTNAME}" \
-    --data-urlencode "identifier=${IDENTIFIER}" \
-    -u "$AUTH" "$SUBMITURL"
+    -d hostname="$HOSTNAME" \
+    -d identifier="$IDENTIFIER" \
+    "$SUBMITURL"
 
-  defaults write /Library/Preferences/ManagedInstalls ClientIdentifier "$HOSTNAME"
+# This is a fix for clients based on a manifest in the root /manifests directory
+# See GitHub issue No. 5
+if [ $( echo "$IDENTIFIER" | grep "/" ) ]
+then
+  IDENTIFIER_PATH=$( echo "$IDENTIFIER" | sed 's/\/[^/]*$//' ); 
+  defaults write /Library/Preferences/ManagedInstalls ClientIdentifier "$IDENTIFIER_PATH/clients/$HOSTNAME"
+else
+  defaults write /Library/Preferences/ManagedInstalls ClientIdentifier "clients/$HOSTNAME"
+fi
  
 exit 0
