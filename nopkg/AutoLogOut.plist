@@ -79,7 +79,7 @@ sudo defaults write /Library/Preferences/.GlobalPreferences.plist com.apple.auto
 	<key>uninstall_script</key>
 	<string>#!/bin/bash
 
-# Set the autologout to 5 minutes (or 300 seconds):
+# Set the autologout to 0 to disable autologout:
 sudo defaults write /Library/Preferences/.GlobalPreferences.plist com.apple.autologout.AutoLogOutDelay -int 0</string>
 	<key>uninstallable</key>
 	<true/>
