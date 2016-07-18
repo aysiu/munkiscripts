@@ -14,4 +14,4 @@ COND_DOMAIN="$MUNKI_DIR/ConditionalItems"
 MUNKI_REPO_IP=$(Nslookup "$MUNKI_REPO" | grep "Address: " | awk -F "Address: " '{print $2}')
 
 ## Writing back the fetched IP address
-$DEFAULTS write "$COND_DOMAIN" munki_repo_id -string "$MUNKI_REPO_IP"
+$DEFAULTS write "$COND_DOMAIN" munki_repo_ip -string "$MUNKI_REPO_IP"
