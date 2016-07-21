@@ -66,7 +66,8 @@ CURL="/usr/bin/curl"
 $CURL --max-time 5 --silent --get \
     -d hostname="$HOSTNAME" \
     -d identifier="$IDENTIFIER" \
-    "$SUBMITURL"
+    -u "$AUTH" "$SUBMITURL"
+## If not basic authentication, then just "$SUBMITURL"
 
 # This is a fix for clients based on a manifest in the root /manifests directory
 # See GitHub issue No. 5
