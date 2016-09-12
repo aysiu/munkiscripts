@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2016-09-12T18:05:47Z</date>
+		<key>munki_version</key>
+		<string>2.8.0.2810</string>
+		<key>os_version</key>
+		<string>10.11.6</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>description</key>
+	<string>Adjusts days between notifications to be more frequent toward the end of the month.</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>Days Between Notifications</string>
+	<key>installcheck_script</key>
+	<string>#!/bin/bash
+
+# Get the current day of month
+currentDate=$(date +"%d")
+
+# Get the current days between notifications
+daysBetweenNotifications=$(defaults read /Library/Preferences/ManagedInstalls DaysBetweenNotifications)
+
+# If it's over 25...
+if [ "$currentDate" -gt 25 ] &amp;&amp; [ "$daysBetweenNotifications" == 1 ]; then
+
+   # Installed
+   echo "Installed"
+   exit 1
+
+# If it's between 17 and 25...
+elif [ "$currentDate" -gt 17 ] &amp;&amp; [ "$daysBetweenNotifications" == 3 ]; then
+
+   # Installed
+   echo "Installed"
+   exit 1
+
+# If it's between 1 and 17
+elif [ "$daysBetweenNotifications" == 17 ]; then
+
+   # Installed
+   echo "Installed"
+   exit 1
+
+# Otherwise...
+else
+
+   # Not installed
+   echo "Not Installed"
+   exit 0
+
+fi</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>DaysBetweenNotifications</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/bash
+
+# Get the current day of month
+currentDate=$(date +"%d")
+
+# If it's over 25...
+if [ "$currentDate" -gt 25 ]; then
+
+   dayBetweenNotifications=1
+   
+# If it's between 17 and 25...
+elif [ "$currentDate" -gt 17 ]; then
+
+   daysBetweenNotifications=3
+
+# Otherwise...
+else
+
+   daysBetweenNotifications=17
+
+fi
+
+# Write the changes back
+sudo defaults write /Library/Preferences/ManagedInstalls DaysBetweenNotifications -int "$daysBetweenNotifications"</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
