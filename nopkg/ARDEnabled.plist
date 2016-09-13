@@ -95,7 +95,7 @@ sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resourc
 	<string>#!/bin/bash
 
 # Stop ARD
-sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -agent -stop</string>
+sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -deactivate -configure -access -off</string>
 	<key>uninstallable</key>
 	<true/>
 	<key>version</key>
