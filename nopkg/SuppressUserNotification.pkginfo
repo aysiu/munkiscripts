@@ -96,11 +96,10 @@ if [ "$currentDate" -gt 25 ] &amp;&amp; ([ "$currentDay" -gt 5 ] ||  [ "$current
     
         # Should be set to false
         sudo defaults write /Library/Preferences/ManagedInstalls SuppressUserNotification -bool FALSE
-    
-    else
+
+else
         # Should be set to true
         sudo defaults write /Library/Preferences/ManagedInstalls SuppressUserNotification -bool TRUE
-    fi
 
 fi</string>
 	<key>unattended_install</key>
