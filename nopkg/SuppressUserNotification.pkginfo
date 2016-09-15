@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2016-09-12T18:05:47Z</date>
+		<key>munki_version</key>
+		<string>2.8.0.2810</string>
+		<key>os_version</key>
+		<string>10.11.6</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>description</key>
+	<string>Adjusts when to notify users, based on time of day and day of week and date of month</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>Suppress User Notifications</string>
+	<key>installcheck_script</key>
+	<string>#!/bin/bash
+
+# Get the suppress user notification setting
+currentSetting=$(defaults read /Library/Preferences/ManagedInstalls SuppressUserNotification)
+
+# Get the current day of month
+currentDate=$(date +"%d")
+
+# Get the current day of the week
+currentDay=$(date +"%u")
+
+# Get the current hour of the day
+currentHour=$(date +"%H")
+
+# The setting should be on or off depending on the day of week, date of month, and time of day
+# So check first if the setting is on
+if [ "$currentSetting" == 1 ]; then
+
+    # This will be okay if it's before the 25th of the month
+    if [ "$currentDate" -lt 26 ]; then
+    
+        # Installed
+        exit 1
+
+    else
+        # Not installed
+        exit 0
+
+    fi
+
+# SuppressUserNotification is off, so let's check whether that's okay or not
+else
+
+    # This isn't okay if it's after the 25th and not during the school day (day 6 and 7 are Saturday and Sunday)
+    if [ "$currentDate" -gt 25 ] &amp;&amp; ([ "$currentDay" -gt 5 ] || [ "$currentHour" -gt 14 ]); then
+    
+        # Installed
+        exit 1
+    
+    else
+        # Not installed
+        exit 0
+    
+    fi
+
+fi</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>SuppressUserNotification</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/bash
+
+# Get the current day of month
+currentDate=$(date +"%d")
+
+# Get the current day of the week
+currentDay=$(date +"%u")
+
+# Get the current hour of the day
+currentHour=$(date +"%H")
+
+if [ "$currentDate" -gt 25 ] &amp;&amp; ([ "$currentDay" -gt 5 ] ||  [ "$currentHour" -gt 14 ]); then
+    
+        # Should be set to false
+        sudo defaults write /Library/Preferences/ManagedInstalls SuppressUserNotification -bool FALSE
+    
+    else
+        # Should be set to true
+        sudo defaults write /Library/Preferences/ManagedInstalls SuppressUserNotification -bool TRUE
+    fi
+
+fi</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
