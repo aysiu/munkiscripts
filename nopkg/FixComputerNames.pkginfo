@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2016-09-16T15:10:09Z</date>
+		<key>munki_version</key>
+		<string>2.8.0.2810</string>
+		<key>os_version</key>
+		<string>10.11.6</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>Fix Computer Names</string>
+	<key>description</key>
+	<string>If you come into an inventory situation in which some pre-Munki'ed machines had the wrong computer names, you can use this nopkg to fix the names to what they should be</string>
+	<key>installcheck_script</key>
+	<string>#!/usr/bin/python
+
+import subprocess
+import sys
+
+# Set up dictionary of serial numbers and host names
+serial_names = {'INSERTSERIALNUMBER': 'INSERTDESIREDCOMPUTERNAME', 'INSERTSERIALNUMBER': 'INSERTDESIREDCOMPUTERNAME', 'INSERTSERIALNUMBER': 'INSERTDESIREDCOMPUTERNAME'}
+
+# Get this computer's serial number (and strip out the extra carriage return)
+serial_number = subprocess.check_output("system_profiler SPHardwareDataType | awk '/Serial/ {print $4}'", shell=True).strip()
+
+# Check that the serial number is in the dictionary
+if serial_number in serial_names:
+   
+   # Find out the computer name (and strip out the extra carriage return)
+   computer_name = subprocess.check_output("scutil --get ComputerName", shell=True).strip()
+
+   # If the name is not the same as is defined in the dictionary...   
+   if serial_names[serial_number] != computer_name:
+      # Not installed
+      sys.exit(0)
+   else:
+      # Installed
+      sys.exit(1)
+else:
+   # Installed (not relevant)
+   sys.exit(1)</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>FixComputerNames</string>
+	<key>postinstall_script</key>
+	<string>#!/usr/bin/python
+
+import subprocess
+
+# Set up dictionary of serial numbers and host names
+serial_names = {'INSERTSERIALNUMBER': 'INSERTDESIREDCOMPUTERNAME', 'INSERTSERIALNUMBER': 'INSERTDESIREDCOMPUTERNAME', 'INSERTSERIALNUMBER': 'INSERTDESIREDCOMPUTERNAME'}
+
+# Get this computer's serial number (and strip out the extra carriage return)
+serial_number = subprocess.check_output("system_profiler SPHardwareDataType | awk '/Serial/ {print $4}'", shell=True).strip()
+
+# Fix it
+cmd = 'sudo scutil --set ComputerName "' + serial_names[serial_number] + '" &amp;&amp; sudo scutil --set LocalHostName "' + serial_names[serial_number] + '" &amp;&amp; sudo scutil --set HostName "' + serial_names[serial_number] + '"'
+subprocess.call(cmd, shell=True)</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
