@@ -31,7 +31,7 @@
 	<string>#!/bin/bash
 
 # Get the suppress user notification setting
-currentSetting=$(defaults read /Library/Preferences/ManagedInstalls SuppressUserNotification)
+currentSetting=$(defaults read /Library/Preferences/ManagedInstalls.plist SuppressUserNotification)
 
 # Get the current day of month
 currentDate=$(date +"%d")
@@ -46,22 +46,22 @@ currentHour=$(date +"%H")
 # So check first if the setting is on
 if [ "$currentSetting" == 1 ]; then
 
-    # This will be okay if it's before the 25th of the month
-    if [ "$currentDate" -lt 26 ]; then
+    # This isn't okay if it's after the 25th and not during the school day
+    if [ "$currentDate" -gt 25 ] &amp;&amp; ([ "$currentDay" -gt 5 ] || [ "$currentHour" -gt 14 ]); then
     
         # Installed
-        exit 1
+        exit 0
 
     else
         # Not installed
-        exit 0
+        exit 1
 
     fi
 
 # SuppressUserNotification is off, so let's check whether that's okay or not
 else
 
-    # This isn't okay if it's after the 25th and not during the school day (day 6 and 7 are Saturday and Sunday)
+    # This is okay if it's after the 25th and not during the school day
     if [ "$currentDate" -gt 25 ] &amp;&amp; ([ "$currentDay" -gt 5 ] || [ "$currentHour" -gt 14 ]); then
     
         # Installed
