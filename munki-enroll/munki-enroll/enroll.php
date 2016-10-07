@@ -18,5 +18,6 @@ if ( file_exists($destination) )
 else
     {
         echo "Computer manifest does not exist. Will create " . $destination;
+        copy($source, $destination);
     }
 ?>
