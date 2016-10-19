@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2016-10-19T20:37:02Z</date>
+		<key>munki_version</key>
+		<string>2.8.2.2855</string>
+		<key>os_version</key>
+		<string>10.12</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>description</key>
+	<string>Removes the client identifier from the ManagedInstalls preference, so that the manifest can be fetched automatically by hostname, fqdn, or serial number.</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>Remove Client Identifier</string>
+	<key>installcheck_script</key>
+	<string>#!/bin/bash
+
+# Check for current client identifier 
+
+currentClient=$(defaults read /Library/Preferences/ManagedInstalls ClientIdentifier)
+
+# It should either be empty or not exist
+if [ -z "$currentClient" ] || [ "$currentClient" == *"does not exist"* ]; then
+
+   # "Installed" (Client Identifier doesn't exist)
+   exit 1
+
+else
+
+   # "Not installed" (Client Identifier exists)
+   exit 0
+
+fi</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>RemoveClientIdentifier</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/bash
+
+sudo defaults delete /Library/Preferences/ManagedInstalls ClientIdentifier</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
