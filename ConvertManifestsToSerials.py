@@ -18,30 +18,33 @@ new_manifests_directory='/Library/WebServer/Documents/munki_repo/newmanifests/'
 ## Define your dictionary of original manifest names and new manifest names. I just did an export to Excel from MunkiReport and then did some find/replace in a text editor. If you're clever with MySQL or have some other way to get the data in the form you want, go for whatever method works for you.
 manifest_to_serial = {'ORIGINALMANIFESTNAME1': 'SERIALNUMBER1', 'ORIGINALMANIFESTNAME2': 'SERIALNUMBER2', 'ORIGINALMANIFESTNAME3': 'SERIALNUMBER3'}
 
-# Make sure the manifests directory location exists.
-if os.path.isdir(new_manifests_directory):
+def main():
+   # Make sure the manifests directory location exists.
+   if os.path.isdir(new_manifests_directory):
 
-   # Loop through old manifests dictionary
-   for old_name, serial in manifest_to_serial.items():
-      # Get the full path based on the manifests path
-      manifest_path=os.path.join(manifests_directory, old_name)
-      # Double-check the path exists
-      if os.path.isfile(manifest_path):
-         # Create the destination full path
-         new_manifest_path=os.path.join(new_manifests_directory, serial)
-         print "New manifest path will be %s" % new_manifest_path
-         # Copy the file
-         shutil.copyfile(manifest_path, new_manifest_path)
-         print "Copying to new manifest path"
-         # Get the new display name
-         # I had a weird thing where some of the old manifest names had a name and then a hyphen and then the serial number, so you can modify this to suit your organization's needs or just make the display name equal to the old name
-         display_name_temp=old_name.split("-" + serial, 1)
-         display_name=display_name_temp[0]
-         print display_name
-         # Yeah, I know there's plistlib, but I actually found it simpler to just use PlistBuddy. Again, feel free to tweak as you see fit.
-         cmd='/usr/libexec/PlistBuddy -c "Add :display_name string ' + "'" + display_name + "'" + '" ' + new_manifest_path
-         subprocess.call(cmd, shell=True)
-      else:
-         print "%s does not exist" % manifest_path
-else:
-   print "%s does not exist" % new_manifests_directory
+      # Loop through old manifests dictionary
+      for old_name, serial in manifest_to_serial.items():
+         # Get the full path based on the manifests path
+         manifest_path=os.path.join(manifests_directory, old_name)
+         # Double-check the path exists
+         if os.path.isfile(manifest_path):
+            # Create the destination full path
+            new_manifest_path=os.path.join(new_manifests_directory, serial)
+            print "New manifest path will be %s" % new_manifest_path
+            # Copy the file
+            shutil.copyfile(manifest_path, new_manifest_path)
+            print "Copying to new manifest path"
+            # Get the new display name
+            # I had a weird thing where some of the old manifest names had a name and then a hyphen and then the serial number, so you can modify this to suit your organization's needs or just make the display name equal to the old name
+            display_name_temp=old_name.split("-" + serial, 1)
+            display_name=display_name_temp[0]
+            print display_name
+            # Yeah, I know there's plistlib, but I actually found it simpler to just use PlistBuddy. Again, feel free to tweak as you see fit.
+            cmd='/usr/libexec/PlistBuddy -c "Add :display_name string ' + "'" + display_name + "'" + '" ' + new_manifest_path
+            subprocess.call(cmd, shell=True)
+         else:
+            print "%s does not exist" % manifest_path
+   else:
+      print "%s does not exist" % new_manifests_directory
+if __name__ == '__main__':
+   main()
