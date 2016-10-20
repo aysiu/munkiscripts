@@ -9,6 +9,7 @@ import shutil
 import subprocess
 
 ## Define the source manifests directory. Obviously adjust the path based on your actual Munki server setup.
+# Note: This script is fairly simple, because all my manifests were in the same directory (no subdirectories). If you have a lot of subdirectories, you may want to tweak it so it does an os.walk through the subdirectories
 manifests_directory='/Library/WebServer/Documents/munki_repo/manifests/'
 
 ## Define the destination manifests directory. You'll probably merge the two later, but this gives you an intermediate place to put stuff until you do.
