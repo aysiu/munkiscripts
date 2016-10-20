@@ -19,8 +19,8 @@ new_manifests_directory='/Library/WebServer/Documents/munki_repo/newmanifests/'
 manifest_to_serial = {'ORIGINALMANIFESTNAME1': 'SERIALNUMBER1', 'ORIGINALMANIFESTNAME2': 'SERIALNUMBER2', 'ORIGINALMANIFESTNAME3': 'SERIALNUMBER3'}
 
 def main():
-   # Make sure the manifests directory location exists.
-   if os.path.isdir(new_manifests_directory):
+   # Make sure the manifests directory location exists and is writable to
+   if os.path.isdir(new_manifests_directory) and os.access(new_manifests_directory, os.W_OK):
 
       # Loop through old manifests dictionary
       for old_name, serial in manifest_to_serial.items():
