@@ -1,15 +1,13 @@
 #!/usr/bin/python
 
 #### This script will copy/convert named manifests to serial number manifests
-#### This isn't meant out of the box to work on any Munki repository. This is just something I (aysiu) created that I found useful in its current form for my organization, but that I also thought others could adapt for their own needs... so read it over carefully, and make adjustments as fits your own organization's needs.
+#### This isn't meant out of the box to work on any Munki repository. This is just something I (aysiu) created that I found useful in its current form for my organization, but that I also thought others could adapt for their own needs... so read it over carefully, and make adjustments as fits your own organization's needs. For example, this doesn't walk through subdirectories. It just assumes all your manifests to be converted are in the top-level directory.
 #### Also keep in mind this does nothing to included manifests that shouldn't have a serial number, so you'll probably want to migrate those over later without modification.
 
 import os
-import shutil
-import subprocess
+import plistlib
 
 ## Define the source manifests directory. Obviously adjust the path based on your actual Munki server setup.
-# Note: This script is fairly simple, because all my manifests were in the same directory (no subdirectories). If you have a lot of subdirectories, you may want to tweak it so it does an os.walk through the subdirectories
 manifests_directory='/Library/WebServer/Documents/munki_repo/manifests/'
 
 ## Define the destination manifests directory. You'll probably merge the two later, but this gives you an intermediate place to put stuff until you do.
@@ -26,22 +24,23 @@ def main():
       for old_name, serial in manifest_to_serial.items():
          # Get the full path based on the manifests path
          manifest_path=os.path.join(manifests_directory, old_name)
+         print "Old manifest path was %s" % manifest_path
          # Double-check the path exists
          if os.path.isfile(manifest_path):
             # Create the destination full path
             new_manifest_path=os.path.join(new_manifests_directory, serial)
-            print "New manifest path will be %s" % new_manifest_path
-            # Copy the file
-            shutil.copyfile(manifest_path, new_manifest_path)
-            print "Copying to new manifest path"
             # Get the new display name
             # I had a weird thing where some of the old manifest names had a name and then a hyphen and then the serial number, so you can modify this to suit your organization's needs or just make the display name equal to the old name
             display_name_temp=old_name.split("-" + serial, 1)
             display_name=display_name_temp[0]
-            print display_name
-            # Yeah, I know there's plistlib, but I actually found it simpler to just use PlistBuddy. Again, feel free to tweak as you see fit.
-            cmd='/usr/libexec/PlistBuddy -c "Add :display_name string ' + "'" + display_name + "'" + '" ' + new_manifest_path
-            subprocess.call(cmd, shell=True)
+            print "The display name will be %s" % display_name
+            # Get old manifest information into a dictionary
+            manifest_content=plistlib.readPlist(manifest_path)
+            # Change the display name to be display_name in the dictionary
+            manifest_content['display_name'] = display_name
+            # Write back the modified dictionary contents to the new manifest location
+            plistlib.writePlist(manifest_content, new_manifest_path)
+            print "Creating new manifest at %s" % new_manifest_path
          else:
             print "%s does not exist" % manifest_path
    else:
