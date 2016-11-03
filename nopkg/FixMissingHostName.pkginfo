@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2016-11-03T15:30:32Z</date>
+		<key>munki_version</key>
+		<string>2.8.2.2855</string>
+		<key>os_version</key>
+		<string>10.12.1</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>description</key>
+	<string>Finds out if the computer name is set but not the host name and then fixes the host name to match.</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>Fix HostName</string>
+	<key>installcheck_script</key>
+	<string>#!/bin/bash
+
+# See if there is a hostname set
+hostName=$(scutil --get HostName)
+
+if [ -z "$hostName" ]; then
+
+   #echo "There is no hostname"
+   exit 0
+
+else
+
+   # There is a hostname
+   exit 1
+
+fi</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>FixHostName</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/bash
+
+# See if there is a hostname set
+hostName=$(scutil --get HostName)
+
+if [ -z "$hostName" ]; then
+
+   #echo "There is no hostname"
+   
+   # Get the computer name then
+   computerName=$(scutil --get ComputerName)
+
+   # Set the host name to be the computer name
+   sudo scutil --set HostName "$computerName"
+
+
+fi</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
