@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2016-11-04T22:08:53Z</date>
+		<key>munki_version</key>
+		<string>2.8.2.2855</string>
+		<key>os_version</key>
+		<string>10.12.1</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>description</key>
+	<string>Fixes the computer name to match the Munki manifest display name.</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>Computer from Display Name</string>
+	<key>installcheck_script</key>
+	<string>#!/bin/bash
+
+## Script to make the computer name the same as the manifest display name
+
+# Define location of client manifest
+clientManifest='/Library/Managed Installs/manifests/client_manifest.plist'
+
+# Double-check the client manifest exists
+if [ -f "$clientManifest" ]; then
+   # See if there's a display name
+   displayName=$(/usr/libexec/PlistBuddy -c "print :display_name" "$clientManifest")
+   if [ ! -z "$displayName" ]; then
+         # Get the current computer name
+         computerName=$(scutil --get ComputerName)
+         if [ "$computerName" == "$displayName" ]; then
+            # Installed
+            exit 1
+         else
+            exit 0
+         # End checking the display name and the computer name are the same
+         fi
+   # Client manifest but no display name
+   else
+      # Technically not installed, but no way to install it, so just say it's installed for now
+      exit 1
+   # End checking there's a display name
+   fi
+# No client manifest yet
+else
+   # Technically not installed, but no way to install it, so just say it's installed for now
+   exit 1
+# End checking the client manifest exists
+fi</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>ComputerFromDisplayName</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/bash
+
+## Script to make the computer name the same as the manifest display name
+
+# Define location of client manifest
+clientManifest='/Library/Managed Installs/manifests/client_manifest.plist'
+
+# Double-check the client manifest exists
+if [ -f "$clientManifest" ]; then
+   # See if there's a display name
+   displayName=$(/usr/libexec/PlistBuddy -c "print :display_name" "$clientManifest")
+   if [ ! -z "$displayName" ]; then
+      echo "$displayName"
+      # Since it exists, go ahead and change the display name to be the computer name
+      sudo /usr/sbin/scutil --set ComputerName "$displayName"
+      sudo /usr/sbin/scutil --set LocalHostName "$displayName"
+      sudo /usr/sbin/scutil --set HostName "$displayName"
+   fi
+fi</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
