@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2016-11-10T21:42:19Z</date>
+		<key>munki_version</key>
+		<string>2.8.2.2855</string>
+		<key>os_version</key>
+		<string>10.12.1</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>description</key>
+	<string>Checks to see if machines are connected to undesired networks and removes those networks from the preferred networks if the desired network is also in there.</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>Preferred Wireless Check</string>
+	<key>installcheck_script</key>
+	<string>#!/bin/bash
+
+# Find the wireless network hardware port name
+# Code to get next line after "Wi-Fi" is from http://superuser.com/a/298125
+# Code to get only the text after "Device: " is from http://unix.stackexchange.com/a/24151
+wifiport=$(/usr/sbin/networksetup -listallhardwareports | /usr/bin/grep -A1 "Wi-Fi" | /usr/bin/sed -n -e 's/^.*Device: //p')
+
+desiredwireless=$(networksetup -listpreferredwirelessnetworks "$wifiport" | grep "NAMEOFDESIREDWIRELESSNETWORK")
+
+undesiredwireless1=$(networksetup -listpreferredwirelessnetworks "$wifiport" | grep "NAMEOFUNDESIREDWIRELESS1")
+
+undesiredwireless2=$(networksetup -listpreferredwirelessnetworks "$wifiport" | grep "NAMEOFUNDESIREDWIRELESS2")
+
+if [ -z "$desiredwireless" ]; then
+   # It's "installed," because we can't remove the other networks... desired wireless has to be on there first
+   exit 1
+else
+   # Desired wireless is in place, so let's check the others
+   # You can tack on more than 1 and 2 if you have 3 or 4 or 5
+   if [ ! -z "$undesiredwireless1" ] || [ ! -z "$undesiredwireless2" ]; then
+      # If any undesired wireless is in place, this is not "installed"
+      exit 0
+   else
+      # Installed
+      exit 1
+   fi
+fi</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>PreferredWirelessCheck</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/bash
+
+# Find the wireless network hardware port name
+# Code to get next line after "Wi-Fi" is from http://superuser.com/a/298125
+# Code to get only the text after "Device: " is from http://unix.stackexchange.com/a/24151
+wifiport=$(/usr/sbin/networksetup -listallhardwareports | /usr/bin/grep -A1 "Wi-Fi" | /usr/bin/sed -n -e 's/^.*Device: //p')
+
+function deletePreferred {
+   # See if the network is in the list of preferred networks
+   wirelesstest=$(networksetup -listpreferredwirelessnetworks "$wifiport" | grep "$1")
+   # If it is, remove it
+   if [ ! -z "$wirelesstest" ]; then
+      sudo networksetup -removepreferredwirelessnetwork "$wifiport" "$1"
+   fi
+}
+
+deletePreferred "NAMEOFUNDESIREDWIRELESS1"
+deletePreferred "NAMEOFUNDESIREDWIRELESS2"
+
+# Toggle wireless to just have an automatic scan and reconnect to a remaining favorite
+networksetup -setairportpower "$wifiport" off &amp;&amp; sleep 3 &amp;&amp; networksetup -setairportpower "$wifiport" on</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
