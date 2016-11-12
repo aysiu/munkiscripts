@@ -1,0 +1,25 @@
+#!/bin/bash
+
+MUNKI_REPO='https://munki.yourcompany.com'
+AUTHINFO='basicauthinfo64encoded'
+
+# Make sure the Apple Setup doesn't run
+sudo /usr/bin/touch "$3"/var/db/.AppleSetupDone
+
+# Install Munki
+sudo /usr/sbin/installer -pkg "$3"/tmp/munkitools-*.pkg -target "$3"/
+
+# Install Outset
+sudo /usr/sbin/installer -pkg "$3"/tmp/outset-*.pkg -target "$3"/
+
+# Write the repo of the secured server
+sudo /usr/bin/defaults write "$3"/Library/Preferences/ManagedInstalls SoftwareRepoURL "$MUNKI_REPO"
+
+# Put in additional headers for basic authentication
+sudo /usr/bin/defaults write "$3"/private/var/root/Library/Preferences/ManagedInstalls AdditionalHttpHeaders -array "Authorization: Basic $AUTHINFO"
+
+# Set Apple updates to install.. has to be at the publicly-readable one
+sudo /usr/bin/defaults write "$3"/Library/Preferences/ManagedInstalls InstallAppleSoftwareUpdates -bool true
+
+# Create bootstrap file
+sudo touch "$3"/Users/Shared/.com.googlecode.munki.checkandinstallatstartup
