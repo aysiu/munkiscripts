@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2016-12-08T18:06:24Z</date>
+		<key>munki_version</key>
+		<string>2.8.2.2855</string>
+		<key>os_version</key>
+		<string>10.12.1</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>description</key>
+	<string>Checks to see if the normal roughly-once-an-hour Munki check is enabled, and enables it if necessary.
+
+Assumes you may have created a revised Munki check at one point: http://technology.siprep.org/keeping-up-to-date-using-munki-without-bothering-users/</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>Normal Munki Check</string>
+	<key>installcheck_script</key>
+	<string>#!/bin/bash
+
+# Check to see if the revised is running
+revised=$(sudo launchctl list | grep com.googlecode.munki.managedsoftwareupdate-check.revised)
+
+if [ -z "$revised" ]; then
+   
+   # Okay, so the revised launchdaemon isn't running... is the normal one running?
+   normal=$(launchctl list | grep com.googlecode.munki.managedsoftwareupdate-check)
+
+   if [ -z "$normal" ]; then
+      # If the normal isn't running, this isn't installed
+         exit 0
+      
+      else
+      # If the normal is running, this is installed
+         exit 1
+   
+   fi
+
+else
+   # Since the revised is still running, this isn't installed
+   exit 0
+
+fi</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>NormalMunkiCheck</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/bash
+
+# There are two ways this has to be "installed." Either the revised is running in place of the normal launch daemon... or the normal launch daemon is just not running at all
+
+# Revised location
+revisedLocation='/Library/LaunchDaemons/com.googlecode.munki.managedsoftwareupdate-check.revised.plist'
+
+# Check to see if the revised is running
+revisedRunning=$(sudo launchctl list | grep com.googlecode.munki.managedsoftwareupdate-check.revised)
+
+if [ ! -z "$revisedRunning" ]; then
+   # If the revised is running, shut it off
+   sudo launchctl unload "$revisedLocation"
+   
+   # Let's also delete it
+   sudo rm "$revisedLocation"
+   
+fi
+
+# Either way, we have to make sure the normal launch daemon is running
+sudo launchctl load -w '/Library/LaunchDaemons/com.googlecode.munki.managedsoftwareupdate-check.plist'</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
