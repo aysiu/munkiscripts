@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2016-02-19T17:16:02Z</date>
+		<key>munki_version</key>
+		<string>2.4.0.2561</string>
+		<key>os_version</key>
+		<string>10.11.3</string>
+		<key>promotion_date</key>
+		<string>2016-05-24</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>description</key>
+	<string>Checks to make sure Bluetooth is turned on.</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>Bluetooth On</string>
+	<key>installcheck_script</key>
+	<string>#!/bin/bash
+
+# Thanks to Greg Neagle for this tip: https://groups.google.com/d/msg/macenterprise/rkG3ptUpkCY/xOwhNM0zDl8J
+
+# create test variable
+testVariable=$(defaults read /Library/Preferences/com.apple.Bluetooth ControllerPowerState)
+
+if [ "$testVariable" == "1" ]; then
+
+	# It's on ("installed")
+	exit 1
+
+else
+
+	# It's off ("not installed")
+	exit 0
+fi</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>BluetoothOn</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/bash
+
+# Turn on Bluetooth
+sudo defaults write /Library/Preferences/com.apple.Bluetooth ControllerPowerState -bool TRUE</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>unattended_uninstall</key>
+	<true/>
+	<key>uninstall_method</key>
+	<string>uninstall_script</string>
+	<key>uninstall_script</key>
+	<string>#!/bin/bash
+
+# Turn off Bluetooth
+sudo defaults write /Library/Preferences/com.apple.Bluetooth ControllerPowerState -bool FALSE</string>
+	<key>uninstallable</key>
+	<true/>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
