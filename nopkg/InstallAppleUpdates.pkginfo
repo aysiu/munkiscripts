@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2016-12-14T17:40:50Z</date>
+		<key>munki_version</key>
+		<string>2.8.2.2855</string>
+		<key>os_version</key>
+		<string>10.12.2</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>description</key>
+	<string>Have Munki manage the installation of Apple updates.</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>Install Apple Updates</string>
+	<key>installcheck_script</key>
+	<string>#!/bin/bash
+
+# Munki set to install Apple updates?
+MunkiSetting=$(defaults read /Library/Preferences/ManagedInstalls InstallAppleSoftwareUpdates)
+
+# Unattended install of Apple updates?
+UnattendedSetting=$(defaults read /Library/Preferences/ManagedInstalls UnattendedAppleUpdates)
+
+# Built-in Checks?
+BuiltIn=$(defaults read /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled)
+
+if [ "$MunkiSetting" == 1 ] &amp;&amp; [ "$UnattendedSetting" == 1 ] &amp;&amp; [ "$BuiltIn" == 0 ]; then
+
+   # Installed
+   exit 1
+
+else
+
+   # Not installed
+   exit 0
+
+fi</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>InstallAppleUpdates</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/bash
+
+# Just have Munki do it
+sudo defaults write /Library/Preferences/ManagedInstalls InstallAppleSoftwareUpdates -bool TRUE
+
+# Make sure Apple updates are unattended when possible
+sudo defaults write /Library/Preferences/ManagedInstalls UnattendedAppleUpdates -bool TRUE
+
+# Turn off Apple's built-in checks for updates
+sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled -bool FALSE</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>unattended_uninstall</key>
+	<true/>
+	<key>uninstall_method</key>
+	<string>uninstall_script</string>
+	<key>uninstall_script</key>
+	<string>#!/bin/bash
+
+# No longer have Munki do it
+sudo defaults write /Library/Preferences/ManagedInstalls InstallAppleSoftwareUpdates -bool FALSE
+
+# Turn off unattended Apple updates
+sudo defaults write /Library/Preferences/ManagedInstalls UnattendedAppleUpdates -bool FALSE
+
+# Turn on Apple's built-in checks for updates
+sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled -bool TRUE</string>
+	<key>uninstallable</key>
+	<true/>
+	<key>version</key>
+	<string>2.0</string>
+</dict>
+</plist>
