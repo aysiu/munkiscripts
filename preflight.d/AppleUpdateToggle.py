@@ -8,7 +8,6 @@ import sys
 # This may not be necessary if this is the preflight script and not a preflight script in a directory (e.g., created by MunkiReport)
 sys.path.insert(0,'/usr/local/munki') # From MunkiReport preflight code TODO: make this relative
 
-from munkilib import munkicommon
 from munkilib import FoundationPlist
 
 def main():
