@@ -49,11 +49,11 @@ if [ "$currentSetting" == 1 ]; then
     # This isn't okay if it's after the 25th and not during the school day
     if [ "$currentDate" -gt 25 ] &amp;&amp; ([ "$currentDay" -gt 5 ] || [ "$currentHour" -gt 14 ]); then
     
-        # Installed
+        # Not installed
         exit 0
 
     else
-        # Not installed
+        # Installed
         exit 1
 
     fi
