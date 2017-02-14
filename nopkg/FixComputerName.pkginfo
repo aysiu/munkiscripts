@@ -54,32 +54,40 @@ check_name(){
     fi
 }
 
-# Check the client manifest exists (it should)
-if [ -f "$client_manifest" ]; then
+# Make sure the computer isn't joined to the domain
+adconfig=$(dsconfigad -show)
 
-    # Check that the key we're looking for exists
-    key_check=$(defaults read "$client_manifest" | grep "$key_for_name")
-    if [ ! -z "$key_check" ]; then
+if [ -z "$adconfig" ]; then
+
+    # Check the client manifest exists (it should)
+    if [ -f "$client_manifest" ]; then
+
+        # Check that the key we're looking for exists
+        key_check=$(defaults read "$client_manifest" | grep "$key_for_name")
+        if [ ! -z "$key_check" ]; then
     
-        # Get the actual key value and trim whitespace
-        desired_name=$(defaults read "$client_manifest" "$key_for_name" | sed -e 's/^[ \t]*//')
+            # Get the actual key value and trim whitespace
+            desired_name=$(defaults read "$client_manifest" "$key_for_name" | sed -e 's/^[ \t]*//')
 
-        # Make sure the desired_name isn't blank, because then you're renaming the computer to nothing
-        if [ ! -z "$desired_name" ]; then
+            # Make sure the desired_name isn't blank, because then you're renaming the computer to nothing
+            if [ ! -z "$desired_name" ]; then
 
-            # Loop through the array of name types and process those
-            for name_type in "${name_types[@]}"
-                do
-                    check_name "$name_type" "$desired_name"
-                done
+                # Loop through the array of name types and process those
+                for name_type in "${name_types[@]}"
+                    do
+                        check_name "$name_type" "$desired_name"
+                    done
 
-        # End checking the desired name isn't blank
+            # End checking the desired name isn't blank
+            fi
+
+        # End checking key exists
         fi
 
-    # End checking key exists
+    # End checking file exists
     fi
 
-# End checking file exists
+# End checking not bound to AD
 fi
 
 # If we get this far, it's essentially "installed." If, for example, the value is just a bunch of stripped-out whitespace, there's no point in "installing" this item to not change anything.
@@ -116,32 +124,40 @@ check_name(){
     fi
 }
 
-# Check the client manifest exists (it should)
-if [ -f "$client_manifest" ]; then
+# Make sure the computer isn't joined to the domain
+adconfig=$(dsconfigad -show)
 
-    # Check that the key we're looking for exists
-    key_check=$(defaults read "$client_manifest" | grep "$key_for_name")
-    if [ ! -z "$key_check" ]; then
+if [ -z "$adconfig" ]; then
 
-        # Get the actual key value and trim whitespace
-        desired_name=$(defaults read "$client_manifest" "$key_for_name" | sed -e 's/^[ \t]*//')
+    # Check the client manifest exists (it should)
+    if [ -f "$client_manifest" ]; then
+
+        # Check that the key we're looking for exists
+        key_check=$(defaults read "$client_manifest" | grep "$key_for_name")
+        if [ ! -z "$key_check" ]; then
+
+            # Get the actual key value and trim whitespace
+            desired_name=$(defaults read "$client_manifest" "$key_for_name" | sed -e 's/^[ \t]*//')
         
-        # Make sure the desired_name isn't blank, because then you're renaming the computer to nothing
-        if [ ! -z "$desired_name" ]; then
+            # Make sure the desired_name isn't blank, because then you're renaming the computer to nothing
+            if [ ! -z "$desired_name" ]; then
 
-            # Loop through the array of name types and process those
-            for name_type in "${name_types[@]}"
-                do
-                    check_name "$name_type" "$desired_name"
-                done
+                # Loop through the array of name types and process those
+                for name_type in "${name_types[@]}"
+                    do
+                        check_name "$name_type" "$desired_name"
+                    done
 
-        # End checking the desired name isn't blank
+            # End checking the desired name isn't blank
+            fi
+
+        # End checking key exists
         fi
 
-    # End checking key exists
+    # End checking file exists
     fi
 
-# End checking file exists
+# End checking not bound to AD
 fi</string>
 	<key>unattended_install</key>
 	<true/>
