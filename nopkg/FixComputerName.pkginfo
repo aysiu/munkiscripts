@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2017-02-14T20:24:42Z</date>
+		<key>munki_version</key>
+		<string>2.8.2.2855</string>
+		<key>os_version</key>
+		<string>10.12.3</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>description</key>
+	<string>Fixes the computer name to match display name, user, or notes in the client manifest.</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>Fix Computer Name</string>
+	<key>installcheck_script</key>
+	<string>#!/bin/bash
+
+# Uncomment only one of these for what key holds the value for the computer name you want to set.
+#key_for_name='user'
+key_for_name='display_name'
+#key_for_name='notes'
+
+# Location of client manifest on client
+client_manifest='/Library/Managed Installs/manifests/client_manifest.plist'
+
+# Array of computer name types
+name_types=('ComputerName'
+'HostName'
+'LocalHostName')
+
+# Function to check desired name against current name. First parameter is name type, and second parameter is the desired name
+check_name(){
+    # Let's get the current name for the name type
+    current_name=$(scutil --get "$1")
+    # If they don't match, it's not installed
+    if [ "$current_name" != "$2" ]; then
+        # It's not installed if any of these does not match
+        exit 0
+    fi
+}
+
+# Check the client manifest exists (it should)
+if [ -f "$client_manifest" ]; then
+
+    # Check that the key we're looking for exists
+    key_check=$(defaults read "$client_manifest" | grep "$key_for_name")
+    if [ ! -z "$key_check" ]; then
+    
+        # Get the actual key value and trim whitespace
+        desired_name=$(defaults read "$client_manifest" "$key_for_name" | sed -e 's/^[ \t]*//')
+
+        # Make sure the desired_name isn't blank, because then you're renaming the computer to nothing
+        if [ ! -z "$desired_name" ]; then
+
+            # Loop through the array of name types and process those
+            for name_type in "${name_types[@]}"
+                do
+                    check_name "$name_type" "$desired_name"
+                done
+
+        # End checking the desired name isn't blank
+        fi
+
+    # End checking key exists
+    fi
+
+# End checking file exists
+fi
+
+# If we get this far, it's essentially "installed." If, for example, the value is just a bunch of stripped-out whitespace, there's no point in "installing" this item to not change anything.
+exit 1</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>FixComputerName</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/bash
+
+# Uncomment only one of these for what key holds the value for the computer name you want to set.
+#key_for_name='user'
+key_for_name='display_name'
+#key_for_name='notes'
+
+# Location of client manifest on client
+client_manifest='/Library/Managed Installs/manifests/client_manifest.plist'
+
+# Array of computer name types
+name_types=('ComputerName'
+'HostName'
+'LocalHostName')
+
+# Function to check desired name against current name. First parameter is name type, and second parameter is the desired name
+check_name(){
+    # Let's get the current name for the name type
+    current_name=$(scutil --get "$1")
+    # If they don't match, make them match
+    if [ "$current_name" != "$2" ]; then
+        sudo scutil --set "$1" "$2"
+    fi
+}
+
+# Check the client manifest exists (it should)
+if [ -f "$client_manifest" ]; then
+
+    # Check that the key we're looking for exists
+    key_check=$(defaults read "$client_manifest" | grep "$key_for_name")
+    if [ ! -z "$key_check" ]; then
+
+        # Get the actual key value and trim whitespace
+        desired_name=$(defaults read "$client_manifest" "$key_for_name" | sed -e 's/^[ \t]*//')
+        
+        # Make sure the desired_name isn't blank, because then you're renaming the computer to nothing
+        if [ ! -z "$desired_name" ]; then
+
+            # Loop through the array of name types and process those
+            for name_type in "${name_types[@]}"
+                do
+                    check_name "$name_type" "$desired_name"
+                done
+
+        # End checking the desired name isn't blank
+        fi
+
+    # End checking key exists
+    fi
+
+# End checking file exists
+fi</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>version</key>
+	<string>1.1</string>
+</dict>
+</plist>
