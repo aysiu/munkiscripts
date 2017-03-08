@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2017-03-08T16:53:18Z</date>
+		<key>munki_version</key>
+		<string>2.8.2.2855</string>
+		<key>os_version</key>
+		<string>10.12.3</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>description</key>
+	<string>Sets up deferred Filevault encryption, prompting the user ten times at login before finally forcing encryption to happen. Goes based on last-logged-in user.</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>FileVault Deferred</string>
+	<key>installcheck_script</key>
+	<string>#!/bin/bash
+
+# Check to see if the institutional recovery key exists on this machine
+institutional_recovery_key='/PATH/TO/YOUR/DEPLOYED.keychain'
+
+if [ -f "$institutional_recovery_key" ]; then
+
+   # The institutional recovery key is in, so let's check on the deferral status
+   deferral_status=$(sudo fdesetup showdeferralinfo)
+
+   if [[ "$deferral_status" == *"Not found."* ]]; then
+
+      # Deferral has not been set up yet
+      exit 0
+
+   else
+
+      # Deferral has been set up
+      exit 1
+
+   fi
+
+else
+
+   # The institutional recovery key has not yet been set. For all intents and purposes, deferred FV2 is already "installed" because we want to wait until the institutional recovery key is in place.
+   exit 1
+
+fi</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>FileVaultDeferred</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/bash
+
+# Recovery path
+recovery_path='/YOURCUSTOM/PATH/TO/recovery.plist'
+
+# Get the last logged in user
+last_user=$(defaults read /Library/Preferences/com.apple.loginwindow.plist lastUserName)
+
+sudo fdesetup enable -user "$last_user" -defer "$recovery_path" -norecoverykey -keychain -forceatlogin 10</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
