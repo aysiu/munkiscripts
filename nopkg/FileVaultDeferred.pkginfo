@@ -30,30 +30,55 @@
 	<key>installcheck_script</key>
 	<string>#!/bin/bash
 
-# Check to see if the institutional recovery key exists on this machine
-institutional_recovery_key='/PATH/TO/YOUR/DEPLOYED.keychain'
+# Check to see if FileVault is already enabled... no need to defer it if it's already on
+fv_status=$(fdesetup status)
 
-if [ -f "$institutional_recovery_key" ]; then
+if [[ "$fv_status" == *"FileVault is On."* ]]; then
 
-   # The institutional recovery key is in, so let's check on the deferral status
-   deferral_status=$(sudo fdesetup showdeferralinfo)
-
-   if [[ "$deferral_status" == *"Not found."* ]]; then
-
-      # Deferral has not been set up yet
-      exit 0
-
-   else
-
-      # Deferral has been set up
-      exit 1
-
-   fi
+   # FileVault already enabled
+   exit 1
 
 else
 
-   # The institutional recovery key has not yet been set. For all intents and purposes, deferred FV2 is already "installed" because we want to wait until the institutional recovery key is in place.
-   exit 1
+   # Check that there was ever a user logged in
+   login_check=$(defaults read /Library/Preferences/com.apple.loginwindow.plist | grep lastUserName)
+   
+   # If no user ever logged in...
+   if [ -z "$login_check" ]; then
+      
+      # It's essentially "installed," because you can't defer enrollment for the last logged in user if no user ever logged in
+      exit 1
+
+   else
+
+      # Check to see if the institutional recovery key exists on this machine
+      institutional_recovery_key='/PATH/TO/YOUR/DEPLOYED.keychain'
+
+      if [ -f "$institutional_recovery_key" ]; then
+
+         # The institutional recovery key is in, so let's check on the deferral status
+         deferral_status=$(sudo fdesetup showdeferralinfo)
+
+         if [[ "$deferral_status" == *"Not found."* ]]; then
+
+            # Deferral has not been set up yet
+            exit 0
+
+         else
+
+            # Deferral has been set up
+            exit 1
+
+         fi
+
+      else
+
+         # The institutional recovery key has not yet been set. For all intents and purposes, deferred FV2 is already "installed" because we want to wait until the institutional recovery key is in place.
+         exit 1
+
+      fi
+
+   fi
 
 fi</string>
 	<key>installer_type</key>
