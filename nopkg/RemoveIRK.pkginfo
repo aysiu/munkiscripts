@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2017-03-21T15:51:24Z</date>
+		<key>munki_version</key>
+		<string>2.8.2.2855</string>
+		<key>os_version</key>
+		<string>10.12.3</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>description</key>
+	<string>Removes the institutional recovery key after the personal recovery key is installed.</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>Remove Institutional Recovery KEy</string>
+	<key>installcheck_script</key>
+	<string>#!/bin/bash
+
+institutional_check=$(/usr/bin/fdesetup hasinstitutionalrecoverykey)
+
+if [ "$institutional_check" == true ]; then
+
+   # It's not installed
+   exit 0
+
+else
+
+   # It is installed
+   exit 1
+
+fi</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>RemoveIRK</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/bash
+
+# Path to inputplist we'll create
+input_plist='/var/root/temp.plist'
+
+# Location of fderekey plist
+fderekey_plist='/var/root/fderekey.plist'
+
+# Double-check that plist exists (it should)
+if [ -f "$fderekey_plist" ]; then
+
+   # Get the current personal recovery key
+   current_key=$(sudo defaults read "$fderekey_plist" RecoveryKey)
+
+   # Single quote expansion of variables gets messy in bash, so we're going to pre-double-quote the single-quotes
+   current_key_name="'""$current_key""'"
+
+   # Create plist needed
+   sudo /usr/libexec/PlistBuddy -c "add :Password string $current_key" "$input_plist"
+
+   # Remove the institutional recovery key
+   sudo /usr/bin/fdesetup removerecovery -institutional -inputplist &lt; "$input_plist"
+
+   # Remove the temporary input plist 
+   sudo /bin/rm "$input_plist"
+
+fi</string>
+	<key>requires</key>
+	<array>
+		<string>fde-rekey</string>
+	</array>
+	<key>unattended_install</key>
+	<true/>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
