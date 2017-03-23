@@ -47,11 +47,11 @@ if [ -f "$client_manifest" ]; then
 	cm_exists=1
 else
 
-	# Serial number
-	serial_number=$(ioreg -c IOPlatformExpertDevice -d 2 | awk -F\" '/IOPlatformSerialNumber/{print $(NF-1)}')
+	# Get name of manifest
+	manifest_name=$(cat /Library/Managed\ Installs/Logs/ManagedSoftwareUpdate.log | grep "Using manifest" | tail -1 | awk -F "Using manifest: " '{print $2}')
 
 	# Alternate location (Munki 3?)
-	cm_alternate="/Library/Managed Installs/manifests/$serial_number"
+	cm_alternate="/Library/Managed Installs/manifests/$manifest_name"
 
 	if [ -f "$cm_alternate" ]; then
 
@@ -141,11 +141,11 @@ if [ -f "$client_manifest" ]; then
 	cm_exists=1
 else
 
-	# Serial number
-	serial_number=$(ioreg -c IOPlatformExpertDevice -d 2 | awk -F\" '/IOPlatformSerialNumber/{print $(NF-1)}')
+	# Get name of manifest
+	manifest_name=$(cat /Library/Managed\ Installs/Logs/ManagedSoftwareUpdate.log | grep "Using manifest" | tail -1 | awk -F "Using manifest: " '{print $2}')
 
 	# Alternate location (Munki 3?)
-	cm_alternate="/Library/Managed Installs/manifests/$serial_number"
+	cm_alternate="/Library/Managed Installs/manifests/$manifest_name"
 
 	if [ -f "$cm_alternate" ]; then
 
