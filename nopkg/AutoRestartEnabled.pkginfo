@@ -53,7 +53,7 @@ fi</string>
 	<string>#!/bin/bash
 
 # Set autorestart to true
-pmset -c autorestart 1</string>
+pmset -a autorestart 1</string>
 	<key>unattended_install</key>
 	<true/>
 	<key>uninstall_method</key>
@@ -61,8 +61,8 @@ pmset -c autorestart 1</string>
 	<key>uninstall_script</key>
 	<string>#!/bin/bash
 
-# Set autorestart to true
-pmset -c autorestart 0</string>
+# Set autorestart to false
+pmset -a autorestart 0</string>
 	<key>uninstallable</key>
 	<true/>
 	<key>version</key>
