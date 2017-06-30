@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2017-06-30T22:37:21Z</date>
+		<key>munki_version</key>
+		<string>3.0.2.3347</string>
+		<key>os_version</key>
+		<string>10.12.5</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>description</key>
+	<string>Selects Prevent computer from sleeping automatically checkbox in System Preferences.</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>Display Off No Sleep</string>
+	<key>installcheck_script</key>
+	<string>#!/bin/bash
+
+# See what the setting is at currently (should be 0)
+current_sleep=$(pmset -g | grep -w sleep | awk -F " " '{print $2}')
+
+if [[ "$current_sleep" == 0 ]]; then
+
+	# Already installed
+	exit 1
+
+else
+
+	# Not installed
+	exit 0
+
+fi</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>DisplayOffNoSleep</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/bash
+
+# Prevent computer from sleeping automatically when the display is off
+sudo pmset -a sleep 0</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>unattended_uninstall</key>
+	<true/>
+	<key>uninstall_method</key>
+	<string>uninstall_script</string>
+	<key>uninstall_script</key>
+	<string>#!/bin/bash
+
+# Don't prevent computer from sleeping automatically when the display is off
+sudo pmset -a sleep 60</string>
+	<key>uninstallable</key>
+	<true/>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
