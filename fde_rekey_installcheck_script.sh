@@ -22,7 +22,7 @@ if [[ -f "$plist" ]]; then
 	if [[ -z "$output_test" ]]; then
 
 		# If "true" wasn't in there, it's not installed
-		#"Echo it's not installed"
+		#"echo it's not installed"
 		exit 0
 
 	else
