@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2017-12-15T20:15:34Z</date>
+		<key>munki_version</key>
+		<string>3.1.1.3447</string>
+		<key>os_version</key>
+		<string>10.13.2</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>description</key>
+	<string>Changes the IPv6 Wi-Fi configuration from automatic to off.</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>Wi-Fi IPv6 Disable</string>
+	<key>installcheck_script</key>
+	<string>#!/bin/bash
+
+ipv6_check=$(/usr/sbin/networksetup -getinfo Wi-Fi | /usr/bin/grep "IPv6: Off")
+
+if [[ -z "$ipv6_check" ]]; then
+	# If it's empty, then that means it's not off, so "not installed"
+	exit 0
+
+else
+	# If it's not empty, then that mean it is off, so "installed"
+	exit 1
+
+fi</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>IPv6Disable</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/bash
+
+# Turn IPv6 off
+/usr/sbin/networksetup -setv6off Wi-Fi</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>unattended_uninstall</key>
+	<true/>
+	<key>uninstall_method</key>
+	<string>uninstall_script</string>
+	<key>uninstall_script</key>
+	<string>#!/bin/bash
+
+# Change IPv6 back to automatic
+/usr/sbin/networksetup -setv6automatic Wi-Fi</string>
+	<key>uninstallable</key>
+	<true/>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
