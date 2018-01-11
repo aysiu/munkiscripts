@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2018-01-11T22:36:38Z</date>
+		<key>munki_version</key>
+		<string>3.2.0.3472</string>
+		<key>os_version</key>
+		<string>10.13.2</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>description</key>
+	<string>Regenerates an output .plist of the Crypt recovery key if the .plist doesn’t already exist, but only then. Doesn't just automatically rotate the key if used. Requires Crypt, obviously.</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>Recovery Key Regeneration</string>
+	<key>installcheck_script</key>
+	<string>#!/bin/bash
+
+# Get current RotateUsedKey pref
+RotateUsedKey=$(/usr/bin/defaults read /Library/Preferences/com.grahamgilbert.crypt RotateUsedKey)
+
+# Check if the plist exists and the key is already set not to rotate
+if [[ -f '/var/root/crypt_output.plist' &amp;&amp; "$RotateUsedKey" == 0 ]]; then
+
+	# If both are true, it's "installed"
+	exit 1
+
+else
+
+	# Any other situation, it's not "installed"
+	exit 0
+
+fi</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>RecoveryKeyRegeneration</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/bash
+
+# Get current RotateUsedKey pref
+RotateUsedKey=$(/usr/bin/defaults read /Library/Preferences/com.grahamgilbert.crypt RotateUsedKey)
+
+# Check if the plist doesn't exist
+if [[ ! -f '/var/root/crypt_output.plist' ]]; then
+
+	# We need to set the key to rotate, because the .plist has to be regenerated
+	/usr/bin/defaults write /Library/Preferences/com.grahamgilbert.crypt RotateUsedKey -bool TRUE
+
+# If the plist DOES exist but the rotate used key is set to true, set it to false, since we don't need it any more
+elif [[ "$RotateUsedKey" == 1 ]]; then
+
+	# We don't need the key to rotate, because the .plist already exists
+	/usr/bin/defaults write /Library/Preferences/com.grahamgilbert.crypt RotateUsedKey -bool FALSE
+
+fi</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>update_for</key>
+	<array>
+		<string>Crypt</string>
+	</array>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
