@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>asiu</string>
+		<key>creation_date</key>
+		<date>2018-02-27T20:01:47Z</date>
+		<key>munki_version</key>
+		<string>3.2.0.3476</string>
+		<key>os_version</key>
+		<string>10.13.3</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>description</key>
+	<string>Blocks MacKeeper from running</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>Santa Block MacKeeper</string>
+	<key>icon_name</key>
+	<string>santa.png</string>
+	<key>installcheck_script</key>
+	<string>#!/bin/bash
+
+offending_hash='2df1460a9c76c4a63fa2d0d043fb0254f8fa69a99374f2a0b1e8eee885872614'
+
+# See what the current rule is set as
+rule_check=$(/usr/local/bin/santactl rule --check --certificate --sha256 "$offending_hash" | /usr/bin/grep Blacklisted)
+
+# If it's empty...
+if [[ -z "$rule_check" ]]; then
+
+	# Not installed
+	exit 0
+else
+
+	# Installed
+	exit 1
+fi</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>SantaRuleMacKeeper</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/bash
+
+offending_hash='2df1460a9c76c4a63fa2d0d043fb0254f8fa69a99374f2a0b1e8eee885872614'
+
+# Put in rule
+/usr/local/bin/santactl rule --blacklist --certificate --sha256 "$offending_hash" </string>
+	<key>unattended_install</key>
+	<true/>
+	<key>unattended_uninstall</key>
+	<true/>
+	<key>uninstall_method</key>
+	<string>uninstall_script</string>
+	<key>uninstall_script</key>
+	<string>#!/bin/bash
+
+offending_hash='2df1460a9c76c4a63fa2d0d043fb0254f8fa69a99374f2a0b1e8eee885872614'
+
+# Remove the rule
+/usr/local/bin/santactl rule --remove --certificate --sha256 "$offending_hash" </string>
+	<key>uninstallable</key>
+	<true/>
+	<key>update_for</key>
+	<array>
+		<string>santa</string>
+	</array>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
