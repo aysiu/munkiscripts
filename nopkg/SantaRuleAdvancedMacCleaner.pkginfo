@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2018-02-27T20:01:47Z</date>
+		<key>munki_version</key>
+		<string>3.2.0.3476</string>
+		<key>os_version</key>
+		<string>10.13.3</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>description</key>
+	<string>Blocks Advanced Mac Cleaner from running</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>Santa Block Advanced Mac Cleaner</string>
+	<key>icon_name</key>
+	<string>santa.png</string>
+	<key>installcheck_script</key>
+	<string>#!/bin/bash
+
+offending_hash='554dde9858e78207c2368fd38737456394aa7764808feff6c9bd8d223b2866ce'
+
+# See what the current rule is set as
+rule_check=$(/usr/local/bin/santactl rule --check --certificate --sha256 "$offending_hash" | /usr/bin/grep Blacklisted)
+
+# If it's empty...
+if [[ -z "$rule_check" ]]; then
+
+	# Not installed
+	exit 0
+else
+
+	# Installed
+	exit 1
+fi</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>SantaRuleAdvancedMacCleaner</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/bash
+
+offending_hash='554dde9858e78207c2368fd38737456394aa7764808feff6c9bd8d223b2866ce'
+
+# Put in rule
+/usr/local/bin/santactl rule --blacklist --certificate --sha256 "$offending_hash" </string>
+	<key>unattended_install</key>
+	<true/>
+	<key>unattended_uninstall</key>
+	<true/>
+	<key>uninstall_method</key>
+	<string>uninstall_script</string>
+	<key>uninstall_script</key>
+	<string>#!/bin/bash
+
+offending_hash='554dde9858e78207c2368fd38737456394aa7764808feff6c9bd8d223b2866ce'
+
+# Remove the rule
+/usr/local/bin/santactl rule --remove --certificate --sha256 "$offending_hash" </string>
+	<key>uninstallable</key>
+	<true/>
+	<key>update_for</key>
+	<array>
+		<string>santa</string>
+	</array>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
