@@ -48,7 +48,7 @@ if [ -f "$client_manifest" ]; then
 else
 
 	# Get name of manifest
-	manifest_name=$(cat /Library/Managed\ Installs/Logs/ManagedSoftwareUpdate.log | grep "Using manifest" | tail -1 | awk -F "Using manifest: " '{print $2}')
+	manifest_name=$(/bin/cat /Library/Managed\ Installs/Logs/ManagedSoftwareUpdate.log | /usr/bin/grep "Using manifest" | /usr/bin/tail -1 | /usr/bin/awk -F "Using manifest: " '{print $2}')
 
 	# Alternate location (Munki 3?)
 	cm_alternate="/Library/Managed Installs/manifests/$manifest_name"
@@ -71,7 +71,7 @@ name_types=('ComputerName'
 # Function to check desired name against current name. First parameter is name type, and second parameter is the desired name
 check_name(){
     # Let's get the current name for the name type
-    current_name=$(scutil --get "$1")
+    current_name=$(/usr/sbin/scutil --get "$1")
     # If they don't match, it's not installed
     if [ "$current_name" != "$2" ]; then
         # It's not installed if any of these does not match
@@ -80,7 +80,7 @@ check_name(){
 }
 
 # Make sure the computer isn't joined to the domain
-adconfig=$(dsconfigad -show)
+adconfig=$(/usr/sbin/dsconfigad -show)
 
 if [ -z "$adconfig" ]; then
 
@@ -142,7 +142,7 @@ if [ -f "$client_manifest" ]; then
 else
 
 	# Get name of manifest
-	manifest_name=$(cat /Library/Managed\ Installs/Logs/ManagedSoftwareUpdate.log | grep "Using manifest" | tail -1 | awk -F "Using manifest: " '{print $2}')
+	manifest_name=$(/bin/cat /Library/Managed\ Installs/Logs/ManagedSoftwareUpdate.log | /usr/bin/grep "Using manifest" | /usr/bin/tail -1 | /usr/bin/awk -F "Using manifest: " '{print $2}')
 
 	# Alternate location (Munki 3?)
 	cm_alternate="/Library/Managed Installs/manifests/$manifest_name"
@@ -165,15 +165,15 @@ name_types=('ComputerName'
 # Function to check desired name against current name. First parameter is name type, and second parameter is the desired name
 fix_name(){
     # Let's get the current name for the name type
-    current_name=$(scutil --get "$1")
+    current_name=$(/usr/sbin/scutil --get "$1")
     # If they don't match, make them match
     if [ "$current_name" != "$2" ]; then
-        sudo scutil --set "$1" "$2"
+        /usr/sbin/scutil --set "$1" "$2"
     fi
 }
 
 # Make sure the computer isn't joined to the domain
-adconfig=$(dsconfigad -show)
+adconfig=$(/usr/sbin/dsconfigad -show)
 
 if [ -z "$adconfig" ]; then
 
