@@ -90,7 +90,7 @@ if [ -z "$adconfig" ]; then
          echo "Client manifest exists at $client_manifest"
 
         # Check that the key we're looking for exists
-        key_check=$(/usr/libexec/PlistBuddy -c 'print' "$client_manifest" | grep "$key_for_name")
+        key_check=$(/usr/libexec/PlistBuddy -c 'print' "$client_manifest" | /usr/bin/grep "$key_for_name")
         if [ ! -z "$key_check" ]; then
     
             # Get the actual key value and trim whitespace
