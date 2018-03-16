@@ -31,16 +31,16 @@
 	<string>#!/bin/bash
 
 # Get the suppress user notification setting
-currentSetting=$(defaults read /Library/Preferences/ManagedInstalls.plist SuppressUserNotification)
+currentSetting=$(/usr/bin/defaults read /Library/Preferences/ManagedInstalls.plist SuppressUserNotification)
 
 # Get the current day of month
-currentDate=$(date +"%d")
+currentDate=$(/bin/date +"%d")
 
 # Get the current day of the week
-currentDay=$(date +"%u")
+currentDay=$(/bin/date +"%u")
 
 # Get the current hour of the day
-currentHour=$(date +"%H")
+currentHour=$(/bin/date +"%H")
 
 # The setting should be on or off depending on the day of week, date of month, and time of day
 # So check first if the setting is on
@@ -84,22 +84,22 @@ fi</string>
 	<string>#!/bin/bash
 
 # Get the current day of month
-currentDate=$(date +"%d")
+currentDate=$(/bin/date +"%d")
 
 # Get the current day of the week
-currentDay=$(date +"%u")
+currentDay=$(/bin/date +"%u")
 
 # Get the current hour of the day
-currentHour=$(date +"%H")
+currentHour=$(/bin/date +"%H")
 
 if [ "$currentDate" -gt 25 ] &amp;&amp; ([ "$currentDay" -gt 5 ] ||  [ "$currentHour" -gt 14 ]); then
     
         # Should be set to false
-        sudo defaults write /Library/Preferences/ManagedInstalls SuppressUserNotification -bool FALSE
+        /usr/bin/defaults write /Library/Preferences/ManagedInstalls SuppressUserNotification -bool FALSE
 
 else
         # Should be set to true
-        sudo defaults write /Library/Preferences/ManagedInstalls SuppressUserNotification -bool TRUE
+        /usr/bin/defaults write /Library/Preferences/ManagedInstalls SuppressUserNotification -bool TRUE
 
 fi</string>
 	<key>unattended_install</key>
