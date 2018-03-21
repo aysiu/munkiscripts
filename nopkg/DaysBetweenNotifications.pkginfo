@@ -31,37 +31,37 @@
 	<string>#!/bin/bash
 
 # Get the current day of month
-currentDate=$(date +"%d")
+currentDate=$(/bin/date +"%d")
 
 # Get the current days between notifications
-daysBetweenNotifications=$(defaults read /Library/Preferences/ManagedInstalls DaysBetweenNotifications)
+daysBetweenNotifications=$(/usr/bin/defaults read /Library/Preferences/ManagedInstalls DaysBetweenNotifications)
 
 # If it's over 25...
 if [ "$currentDate" -gt 25 ] &amp;&amp; [ "$daysBetweenNotifications" == 1 ]; then
 
    # Installed
-   echo "Installed"
+   # /bin/echo "Installed"
    exit 1
 
 # If it's between 17 and 25...
 elif [ "$currentDate" -gt 17 ] &amp;&amp; [ "$daysBetweenNotifications" == 3 ]; then
 
    # Installed
-   echo "Installed"
+   # /bin/echo "Installed"
    exit 1
 
 # If it's between 1 and 17
 elif [ "$daysBetweenNotifications" == 17 ]; then
 
    # Installed
-   echo "Installed"
+   # /bin/echo "Installed"
    exit 1
 
 # Otherwise...
 else
 
    # Not installed
-   echo "Not Installed"
+   # /bin/echo "Not Installed"
    exit 0
 
 fi</string>
@@ -75,7 +75,7 @@ fi</string>
 	<string>#!/bin/bash
 
 # Get the current day of month
-currentDate=$(date +"%d")
+currentDate=$(/bin/date +"%d")
 
 # If it's over 25...
 if [ "$currentDate" -gt 25 ]; then
@@ -95,7 +95,7 @@ else
 fi
 
 # Write the changes back
-sudo defaults write /Library/Preferences/ManagedInstalls DaysBetweenNotifications -int "$daysBetweenNotifications"</string>
+/usr/bin/defaults write /Library/Preferences/ManagedInstalls DaysBetweenNotifications -int "$daysBetweenNotifications"</string>
 	<key>unattended_install</key>
 	<true/>
 	<key>version</key>
