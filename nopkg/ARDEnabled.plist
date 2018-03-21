@@ -33,28 +33,28 @@
 # Caveat: This isn't a 100% complete check, because all it does is check whether ARD is running or not and for which users, but it doesn't check if the user has total control. Still... probably good enough for now.
 
 # See if ARDAgent is running
-ARDRunning=$(ps aux | grep "[A]RDAgent.app")
+ARDRunning=$(/bin/ps aux | /usr/bin/grep "[A]RDAgent.app")
 
 if [ -z "$ARDRunning" ]; then
 
    # It's not installed
-   echo "ARD is not running"
+   /bin/echo "ARD is not running"
    exit 0
 
 else
    # Check that all users is not enabled
-   ARDAllUsers=$(defaults read /Library/Preferences/com.apple.RemoteManagement ARD_AllLocalUsers)
+   ARDAllUsers=$(/usr/bin/defaults read /Library/Preferences/com.apple.RemoteManagement ARD_AllLocalUsers)
 
    # Check number of users enabled
-   ARDUserCount=$(dscl . -list /Users naprivs | wc -l)
+   ARDUserCount=$(/usr/bin/dscl . -list /Users naprivs | wc -l)
 
    # Check that the right user is enabled
-   ARDUser=$(dscl . -list /Users naprivs | grep "FILLINTHEBLANK")
+   ARDUser=$(/usr/bin/dscl . -list /Users naprivs | /usr/bin/grep "FILLINTHEBLANK")
    
    if [ -z "$ARDUser" ] || [ "$ARDUserCount" -ne 1 ] || [ "$ARDAllUsers" -eq 1 ]; then
    
       # It's not installed
-      echo "Users are wrong $ARDUser $ARDUserCount $ARDAllUsers"
+      /bin/echo "Users are wrong $ARDUser $ARDUserCount $ARDAllUsers"
       exit 0
    
    else
@@ -74,17 +74,17 @@ fi</string>
 	<key>postinstall_script</key>
 	<string>#!/bin/bash
 # Make sure it's not enabled for all users
-sudo defaults write /Library/Preferences/com.apple.RemoteManagement ARD_AllLocalUsers -bool FALSE
+/usr/bin/defaults write /Library/Preferences/com.apple.RemoteManagement ARD_AllLocalUsers -bool FALSE
 
 # Take off any existing users
-    RemoteManagementUsers=$(dscl . list /Users naprivs | awk '{print $1}')
+    RemoteManagementUsers=$(/usr/bin/dscl . list /Users naprivs | /usr/bin/awk '{print $1}')
         if [ ! -z "$RemoteManagementUsers" ]; then
         	for EnabledUser in $RemoteManagementUsers; do
-            	sudo dscl . delete /Users/$EnabledUser naprivs
+            		/usr/bin/dscl . delete /Users/$EnabledUser naprivs
         	done
         fi
 # Activate ARD for the FILLINTHEBLANK user
-sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -activate -configure -access -on -users FILLINTHEBLANK -privs -all -restart -agent -menu</string>
+/System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -activate -configure -access -on -users FILLINTHEBLANK -privs -all -restart -agent -menu</string>
 	<key>unattended_install</key>
 	<true/>
 	<key>unattended_uninstall</key>
@@ -95,7 +95,7 @@ sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resourc
 	<string>#!/bin/bash
 
 # Stop ARD
-sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -deactivate -configure -access -off</string>
+/System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -deactivate -configure -access -off</string>
 	<key>uninstallable</key>
 	<true/>
 	<key>version</key>
