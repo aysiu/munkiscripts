@@ -4,7 +4,7 @@
 ## Warning: Absolutely be sure that you don't make this a preinstall_script for an item that requires a logout or reboot in order to install!!!
 
 # Get the state of the lastuser
-lastUser=$(defaults read /Library/Preferences/com.apple.loginwindow.plist lastUser)
+lastUser=$(/usr/bin/defaults read /Library/Preferences/com.apple.loginwindow lastUser)
 
 # Check if the last user is logged in...
 if [ ! -z "$lastUser" ] && [ "$lastUser" == "loggedIn" ]; then
