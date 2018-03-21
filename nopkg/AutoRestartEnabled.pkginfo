@@ -30,7 +30,7 @@
 	<key>installcheck_script</key>
 	<string>#!/bin/bash
 
-auto_restart=$(pmset -g | grep autorestart | grep "1")
+auto_restart=$(/usr/bin/pmset -g | /usr/bin/grep autorestart | /usr/bin/grep "1")
 
 if [ ! -z "$auto_restart" ]; then
 
@@ -53,7 +53,7 @@ fi</string>
 	<string>#!/bin/bash
 
 # Set autorestart to true
-pmset -a autorestart 1</string>
+/usr/bin/pmset -a autorestart 1</string>
 	<key>unattended_install</key>
 	<true/>
 	<key>uninstall_method</key>
@@ -62,7 +62,7 @@ pmset -a autorestart 1</string>
 	<string>#!/bin/bash
 
 # Set autorestart to false
-pmset -a autorestart 0</string>
+/usr/bin/pmset -a autorestart 0</string>
 	<key>uninstallable</key>
 	<true/>
 	<key>version</key>
