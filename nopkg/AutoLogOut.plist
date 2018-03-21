@@ -27,7 +27,7 @@
 	<string>#!/bin/bash
 
 # Create a variable to see if the preference even exists
-testVariableOne=$(defaults read /Library/Preferences/.GlobalPreferences.plist | grep "com.apple.autologout.AutoLogOutDelay")
+testVariableOne=$(/usr/bin/defaults read /Library/Preferences/.GlobalPreferences.plist | /usr/bin/grep "com.apple.autologout.AutoLogOutDelay")
 
 # Check if the key exists at all
 if [ -z "$testVariableOne" ]; then
@@ -38,7 +38,7 @@ if [ -z "$testVariableOne" ]; then
 else
 
 	# Create a variable to store the output of the current preferences
-	testVariableTwo=$(defaults read /Library/Preferences/.GlobalPreferences.plist com.apple.autologout.AutoLogOutDelay)
+	testVariableTwo=$(/usr/bin/defaults read /Library/Preferences/.GlobalPreferences.plist com.apple.autologout.AutoLogOutDelay)
 
 	# If it's never been set, the output will be "The domain/default pair of (/Library/Preferences/.GlobalPreferences.plist, com.apple.autologout.AutoLogOutDelay) does not exist"
 	# If it's been set and then turned off again, the output will be "0"
@@ -69,7 +69,7 @@ fi</string>
 
 # Set the autologout to 5 minutes (or 300 seconds):
 ######## If you want to change the timeout, change it here, too ############
-sudo defaults write /Library/Preferences/.GlobalPreferences.plist com.apple.autologout.AutoLogOutDelay -int 300</string>
+/usr/bin/defaults write /Library/Preferences/.GlobalPreferences.plist com.apple.autologout.AutoLogOutDelay -int 300</string>
 	<key>unattended_install</key>
 	<true/>
 	<key>unattended_uninstall</key>
@@ -80,7 +80,7 @@ sudo defaults write /Library/Preferences/.GlobalPreferences.plist com.apple.auto
 	<string>#!/bin/bash
 
 # Set the autologout to 0 to disable autologout:
-sudo defaults write /Library/Preferences/.GlobalPreferences.plist com.apple.autologout.AutoLogOutDelay -int 0</string>
+/usr/bin/defaults write /Library/Preferences/.GlobalPreferences.plist com.apple.autologout.AutoLogOutDelay -int 0</string>
 	<key>uninstallable</key>
 	<true/>
 	<key>version</key>
