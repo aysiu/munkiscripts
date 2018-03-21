@@ -26,7 +26,7 @@ def getPingTime():
    PingTime=100000.000
 
    ## Test the connection speed
-   cmd='ping -c 5 ' + MunkiServer + ' | awk -F "time=" \'{ print $2 }\' | sed s/\'ms\'/\'\'/g'
+   cmd='/sbin/ping -c 5 ' + MunkiServer + ' | /usr/bin/awk -F "time=" \'{ print $2 }\' | /usr/bin/sed s/\'ms\'/\'\'/g'
    PingTest=subprocess.check_output(cmd, shell=True)
 
    # Get the ping results into a list based on the carriage returns
