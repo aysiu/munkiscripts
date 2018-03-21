@@ -41,7 +41,7 @@ if [[ "$fv_status" == *"FileVault is On."* ]]; then
 else
 
    # Check that there was ever a user logged in
-   login_check=$(defaults read /Library/Preferences/com.apple.loginwindow.plist | grep lastUserName)
+   login_check=$(/usr/bin/defaults read /Library/Preferences/com.apple.loginwindow | /usr/bin/grep lastUserName)
    
    # If no user ever logged in...
    if [ -z "$login_check" ]; then
@@ -57,7 +57,7 @@ else
       if [ -f "$institutional_recovery_key" ]; then
 
          # The institutional recovery key is in, so let's check on the deferral status
-         deferral_status=$(sudo fdesetup showdeferralinfo)
+         deferral_status=$(/usr/bin/fdesetup showdeferralinfo)
 
          if [[ "$deferral_status" == *"Not found."* ]]; then
 
@@ -94,9 +94,9 @@ fi</string>
 recovery_path='/YOURCUSTOM/PATH/TO/recovery.plist'
 
 # Get the last logged in user
-last_user=$(defaults read /Library/Preferences/com.apple.loginwindow.plist lastUserName)
+last_user=$(/usr/bin/defaults read /Library/Preferences/com.apple.loginwindow lastUserName)
 
-sudo fdesetup enable -user "$last_user" -defer "$recovery_path" -norecoverykey -keychain -forceatlogin 10</string>
+/usr/bin/fdesetup enable -user "$last_user" -defer "$recovery_path" -norecoverykey -keychain -forceatlogin 10</string>
 	<key>unattended_install</key>
 	<true/>
 	<key>version</key>
