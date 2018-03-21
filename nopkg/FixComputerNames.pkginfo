@@ -37,13 +37,13 @@ import sys
 serial_names = {'INSERTSERIALNUMBER': 'INSERTDESIREDCOMPUTERNAME', 'INSERTSERIALNUMBER': 'INSERTDESIREDCOMPUTERNAME', 'INSERTSERIALNUMBER': 'INSERTDESIREDCOMPUTERNAME'}
 
 # Get this computer's serial number (and strip out the extra carriage return)
-serial_number = subprocess.check_output("system_profiler SPHardwareDataType | awk '/Serial/ {print $4}'", shell=True).strip()
+serial_number = subprocess.check_output("/usr/sbin/system_profiler SPHardwareDataType | /usr/bin/awk '/Serial/ {print $4}'", shell=True).strip()
 
 # Check that the serial number is in the dictionary
 if serial_number in serial_names:
    
    # Find out the computer name (and strip out the extra carriage return)
-   computer_name = subprocess.check_output("scutil --get ComputerName", shell=True).strip()
+   computer_name = subprocess.check_output("/usr/sbin/scutil --get ComputerName", shell=True).strip()
 
    # If the name is not the same as is defined in the dictionary...   
    if serial_names[serial_number] != computer_name:
@@ -70,10 +70,10 @@ import subprocess
 serial_names = {'INSERTSERIALNUMBER': 'INSERTDESIREDCOMPUTERNAME', 'INSERTSERIALNUMBER': 'INSERTDESIREDCOMPUTERNAME', 'INSERTSERIALNUMBER': 'INSERTDESIREDCOMPUTERNAME'}
 
 # Get this computer's serial number (and strip out the extra carriage return)
-serial_number = subprocess.check_output("system_profiler SPHardwareDataType | awk '/Serial/ {print $4}'", shell=True).strip()
+serial_number = subprocess.check_output("/usr/sbin/system_profiler SPHardwareDataType | /usr/bin/awk '/Serial/ {print $4}'", shell=True).strip()
 
 # Fix it
-cmd = 'sudo scutil --set ComputerName "' + serial_names[serial_number] + '" &amp;&amp; sudo scutil --set LocalHostName "' + serial_names[serial_number] + '" &amp;&amp; sudo scutil --set HostName "' + serial_names[serial_number] + '"'
+cmd = '/usr/sbin/scutil --set ComputerName "' + serial_names[serial_number] + '" &amp;&amp; /usr/sbin/scutil --set LocalHostName "' + serial_names[serial_number] + '" &amp;&amp; /usr/sbin/scutil --set HostName "' + serial_names[serial_number] + '"'
 subprocess.call(cmd, shell=True)</string>
 	<key>unattended_install</key>
 	<true/>
