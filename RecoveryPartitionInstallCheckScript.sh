@@ -5,7 +5,7 @@ versionToCheck="10.11.6"
 
 # First, check to see if there is a recovery partition
 
-partitionCheck=$(diskutil list | grep "Recovery HD")
+partitionCheck=$(/usr/sbin/diskutil list | /usr/bin/grep "Recovery HD")
 
 # See if it's empty
 if [ -z "$partitionCheck" ]; then
@@ -16,7 +16,7 @@ if [ -z "$partitionCheck" ]; then
 # If it's not empty, it may be installed... let's check the receipt version
 else
 	# Get the version of the recovery partition installed
-	recoveryVersion=$(pkgutil --pkg-info se.gu.it.RecoveryPartitionInstaller.pkg | grep "version" | awk -F ": " '{print $2}')
+	recoveryVersion=$(/usr/sbin/pkgutil --pkg-info se.gu.it.RecoveryPartitionInstaller.pkg | /usr/bin/grep "version" | /usr/bin/awk -F ": " '{print $2}')
 	
 	# Check the version
 	if [ "$recoveryVersion" == "$versionToCheck" ]; then
