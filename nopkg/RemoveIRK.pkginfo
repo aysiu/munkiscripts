@@ -62,19 +62,19 @@ fderekey_plist='/var/root/fderekey.plist'
 if [ -f "$fderekey_plist" ]; then
 
    # Get the current personal recovery key
-   current_key=$(sudo defaults read "$fderekey_plist" RecoveryKey)
+   current_key=$(/usr/bin/defaults read "$fderekey_plist" RecoveryKey)
 
    # Single quote expansion of variables gets messy in bash, so we're going to pre-double-quote the single-quotes
    current_key_name="'""$current_key""'"
 
    # Create plist needed
-   sudo /usr/libexec/PlistBuddy -c "add :Password string $current_key" "$input_plist"
+   /usr/libexec/PlistBuddy -c "add :Password string $current_key" "$input_plist"
 
    # Remove the institutional recovery key
-   sudo /usr/bin/fdesetup removerecovery -institutional -inputplist &lt; "$input_plist"
+   /usr/bin/fdesetup removerecovery -institutional -inputplist &lt; "$input_plist"
 
    # Remove the temporary input plist 
-   sudo /bin/rm "$input_plist"
+   /bin/rm "$input_plist"
 
 fi</string>
 	<key>requires</key>
