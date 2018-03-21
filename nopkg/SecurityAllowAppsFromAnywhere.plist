@@ -31,7 +31,7 @@
 	<string>#!/bin/bash
 
 # Hold the output of the command to get the status
-testVariable=$(spctl --status)
+testVariable=$(/usr/sbin/spctl --status)
 
 # See if the output is enabled
 if [ "$testVariable" == "assessments enabled" ]; then
@@ -51,7 +51,7 @@ fi</string>
 	<string>#!/bin/bash
 
 # Allow apps from anywhere
-sudo spctl --master-disable</string>
+/usr/sbin/spctl --master-disable</string>
 	<key>unattended_install</key>
 	<true/>
 	<key>unattended_uninstall</key>
@@ -62,7 +62,7 @@ sudo spctl --master-disable</string>
 	<string>#!/bin/bash
 
 # Allow apps from anywhere
-sudo spctl --master-enable</string>
+/usr/sbin/spctl --master-enable</string>
 	<key>uninstallable</key>
 	<true/>
 	<key>version</key>
