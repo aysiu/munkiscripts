@@ -11,7 +11,7 @@ MUNKI_DIR=$($DEFAULTS read /Library/Preferences/ManagedInstalls ManagedInstallDi
 COND_DOMAIN="$MUNKI_DIR/ConditionalItems"
 
 ## Getting the IP address of the Munki repo domain name
-MUNKI_REPO_IP=$(Nslookup "$MUNKI_REPO" | grep "Address: " | awk -F "Address: " '{print $2}')
+MUNKI_REPO_IP=$(/usr/bin/Nslookup "$MUNKI_REPO" | /usr/bin/grep "Address: " | /usr/bin/awk -F "Address: " '{print $2}')
 
 ## Writing back the fetched IP address
 $DEFAULTS write "$COND_DOMAIN" munki_repo_ip -string "$MUNKI_REPO_IP"
