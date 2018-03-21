@@ -34,7 +34,7 @@
 desiredOutput="Remote Login: On"
 
 # Set a variable to store the output of the remote login status
-testVariable=$(sudo systemsetup -getremotelogin)
+testVariable=$(/usr/sbin/systemsetup -getremotelogin)
 
 if [ "$testVariable" == "$desiredOutput" ]; then
 
@@ -57,7 +57,7 @@ fi</string>
 	<string>#!/bin/bash
 
 # Set remote login to on
-sudo systemsetup -setremotelogin on</string>
+/usr/sbin/systemsetup -setremotelogin on</string>
 	<key>unattended_install</key>
 	<true/>
 	<key>unattended_uninstall</key>
@@ -68,7 +68,7 @@ sudo systemsetup -setremotelogin on</string>
 	<string>#!/bin/bash
 
 # Turn off remote
-sudo systemsetup -f -setremotelogin off</string>
+/usr/sbin/systemsetup -f -setremotelogin off</string>
 	<key>uninstallable</key>
 	<true/>
 	<key>version</key>
