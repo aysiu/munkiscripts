@@ -31,7 +31,7 @@
 	<string>#!/bin/bash
 
 # See what the setting is at currently (should be 0)
-current_sleep=$(pmset -g | grep -w sleep | awk -F " " '{print $2}')
+current_sleep=$(/usr/bin/pmset -g | /usr/bin/grep -w sleep | /usr/bin/awk -F " " '{print $2}')
 
 if [[ "$current_sleep" == 0 ]]; then
 
@@ -54,7 +54,7 @@ fi</string>
 	<string>#!/bin/bash
 
 # Prevent computer from sleeping automatically when the display is off
-sudo pmset -a sleep 0</string>
+/usr/bin/pmset -a sleep 0</string>
 	<key>unattended_install</key>
 	<true/>
 	<key>unattended_uninstall</key>
@@ -65,7 +65,7 @@ sudo pmset -a sleep 0</string>
 	<string>#!/bin/bash
 
 # Don't prevent computer from sleeping automatically when the display is off
-sudo pmset -a sleep 60</string>
+/usr/bin/pmset -a sleep 60</string>
 	<key>uninstallable</key>
 	<true/>
 	<key>version</key>
