@@ -35,7 +35,7 @@
 # Thanks to Greg Neagle for this tip: https://groups.google.com/d/msg/macenterprise/rkG3ptUpkCY/xOwhNM0zDl8J
 
 # create test variable
-testVariable=$(defaults read /Library/Preferences/com.apple.Bluetooth ControllerPowerState)
+testVariable=$(/usr/bin/defaults read /Library/Preferences/com.apple.Bluetooth ControllerPowerState)
 
 if [ "$testVariable" == "1" ]; then
 
@@ -57,7 +57,7 @@ fi</string>
 	<string>#!/bin/bash
 
 # Turn on Bluetooth
-sudo defaults write /Library/Preferences/com.apple.Bluetooth ControllerPowerState -bool TRUE</string>
+/usr/bin/defaults write /Library/Preferences/com.apple.Bluetooth ControllerPowerState -bool TRUE</string>
 	<key>unattended_install</key>
 	<true/>
 	<key>unattended_uninstall</key>
@@ -68,7 +68,7 @@ sudo defaults write /Library/Preferences/com.apple.Bluetooth ControllerPowerStat
 	<string>#!/bin/bash
 
 # Turn off Bluetooth
-sudo defaults write /Library/Preferences/com.apple.Bluetooth ControllerPowerState -bool FALSE</string>
+/usr/bin/defaults write /Library/Preferences/com.apple.Bluetooth ControllerPowerState -bool FALSE</string>
 	<key>uninstallable</key>
 	<true/>
 	<key>version</key>
