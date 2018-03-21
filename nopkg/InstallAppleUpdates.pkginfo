@@ -31,13 +31,13 @@
 	<string>#!/bin/bash
 
 # Munki set to install Apple updates?
-MunkiSetting=$(defaults read /Library/Preferences/ManagedInstalls InstallAppleSoftwareUpdates)
+MunkiSetting=$(/usr/bin/defaults read /Library/Preferences/ManagedInstalls InstallAppleSoftwareUpdates)
 
 # Unattended install of Apple updates?
-UnattendedSetting=$(defaults read /Library/Preferences/ManagedInstalls UnattendedAppleUpdates)
+UnattendedSetting=$(/usr/bin/defaults read /Library/Preferences/ManagedInstalls UnattendedAppleUpdates)
 
 # Built-in Checks?
-BuiltIn=$(defaults read /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled)
+BuiltIn=$(/usr/bin/defaults read /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled)
 
 if [ "$MunkiSetting" == 1 ] &amp;&amp; [ "$UnattendedSetting" == 1 ] &amp;&amp; [ "$BuiltIn" == 0 ]; then
 
@@ -60,13 +60,13 @@ fi</string>
 	<string>#!/bin/bash
 
 # Just have Munki do it
-sudo defaults write /Library/Preferences/ManagedInstalls InstallAppleSoftwareUpdates -bool TRUE
+/usr/bin/defaults write /Library/Preferences/ManagedInstalls InstallAppleSoftwareUpdates -bool TRUE
 
 # Make sure Apple updates are unattended when possible
-sudo defaults write /Library/Preferences/ManagedInstalls UnattendedAppleUpdates -bool TRUE
+/usr/bin/defaults write /Library/Preferences/ManagedInstalls UnattendedAppleUpdates -bool TRUE
 
 # Turn off Apple's built-in checks for updates
-sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled -bool FALSE</string>
+/usr/bin/defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled -bool FALSE</string>
 	<key>unattended_install</key>
 	<true/>
 	<key>unattended_uninstall</key>
@@ -77,13 +77,13 @@ sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheck
 	<string>#!/bin/bash
 
 # No longer have Munki do it
-sudo defaults write /Library/Preferences/ManagedInstalls InstallAppleSoftwareUpdates -bool FALSE
+/usr/bin/defaults write /Library/Preferences/ManagedInstalls InstallAppleSoftwareUpdates -bool FALSE
 
 # Turn off unattended Apple updates
-sudo defaults write /Library/Preferences/ManagedInstalls UnattendedAppleUpdates -bool FALSE
+/usr/bin/defaults write /Library/Preferences/ManagedInstalls UnattendedAppleUpdates -bool FALSE
 
 # Turn on Apple's built-in checks for updates
-sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled -bool TRUE</string>
+/usr/bin/defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled -bool TRUE</string>
 	<key>uninstallable</key>
 	<true/>
 	<key>version</key>
