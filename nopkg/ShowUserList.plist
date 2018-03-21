@@ -30,7 +30,7 @@
 	<key>installcheck_script</key>
 	<string>#!/bin/bash
 
-testVariable=$(defaults read /Library/Preferences/com.apple.loginwindow.plist SHOWFULLNAME)
+testVariable=$(/usr/bin/defaults read /Library/Preferences/com.apple.loginwindow SHOWFULLNAME)
 
 if [ "$testVariable" == "1" ]; then
 
@@ -50,7 +50,7 @@ fi</string>
 	<string>#!/bin/bash
 
 # Show the list of users instead of the name and password
-sudo defaults write /Library/Preferences/com.apple.loginwindow SHOWFULLNAME -bool FALSE</string>
+/usr/bin/defaults write /Library/Preferences/com.apple.loginwindow SHOWFULLNAME -bool FALSE</string>
 	<key>unattended_install</key>
 	<true/>
 	<key>unattended_uninstall</key>
@@ -61,7 +61,7 @@ sudo defaults write /Library/Preferences/com.apple.loginwindow SHOWFULLNAME -boo
 	<string>#!/bin/bash
 
 # Show the list of users instead of the name and password
-sudo defaults write /Library/Preferences/com.apple.loginwindow SHOWFULLNAME -bool TRUE</string>
+/usr/bin/defaults write /Library/Preferences/com.apple.loginwindow SHOWFULLNAME -bool TRUE</string>
 	<key>uninstallable</key>
 	<true/>
 	<key>version</key>
