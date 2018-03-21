@@ -34,7 +34,7 @@
 # Exit 1 means installed
 
 # See if the cupsd.conf file contains the word "Resume-"
-testValue=$(grep "Resume-" /etc/cups/cupsd.conf)
+testValue=$(/usr/bin/grep "Resume-" /etc/cups/cupsd.conf)
 
 # See if the value is empty
 if [ -z $testValue ]; then
@@ -52,14 +52,14 @@ fi</string>
 	<string>#!/bin/bash
 
 # First, temporarily disable the CUPS service
-sudo launchctl unload -w /System/Library/LaunchDaemons/org.cups.cupsd.plist
+/bin/launchctl unload -w /System/Library/LaunchDaemons/org.cups.cupsd.plist
 
 # Back up the file with the current timestamp, and do a find/replace "Resume-Printer " and "Resume-Job "
-#sudo sed -i.bak$(date +%Y%m%d%H%M%S) -e s/"Resume-Job "/""/g -e s/"Resume-Printer "/""/g /etc/cups/cupsd.conf
-sudo sed -i.AllowResumebak -e s/"Resume-Job "/""/g -e s/"Resume-Printer "/""/g /etc/cups/cupsd.conf
+# /usr/bin/sed -i.bak$(date +%Y%m%d%H%M%S) -e s/"Resume-Job "/""/g -e s/"Resume-Printer "/""/g /etc/cups/cupsd.conf
+/usr/bin/sed -i.AllowResumebak -e s/"Resume-Job "/""/g -e s/"Resume-Printer "/""/g /etc/cups/cupsd.conf
 
 # Re-enable the CUPS service
-sudo launchctl load -w /System/Library/LaunchDaemons/org.cups.cupsd.plist</string>
+/bin/launchctl load -w /System/Library/LaunchDaemons/org.cups.cupsd.plist</string>
 	<key>unattended_install</key>
 	<true/>
 	<key>unattended_uninstall</key>
@@ -70,21 +70,21 @@ sudo launchctl load -w /System/Library/LaunchDaemons/org.cups.cupsd.plist</strin
 	<string>#!/bin/bash
 
 # First, temporarily disable the CUPS service
-sudo launchctl unload -w /System/Library/LaunchDaemons/org.cups.cupsd.plist
+/bin/launchctl unload -w /System/Library/LaunchDaemons/org.cups.cupsd.plist
 
 # Double-check the backup exists
 if [ -f /etc/cups/cupsd.conf.AllowResumebak ] &amp;&amp; [ -f /etc/cups/cupsd.conf ]; then
 
 	# Delete the current
-	sudo rm /etc/cups/cupsd.conf
+	/bin/rm /etc/cups/cupsd.conf
 
 	# Rename the backup
-	sudo mv /etc/cups/cupsd.conf.AllowResumebak /etc/cups/cupsd.conf
+	/bin/mv /etc/cups/cupsd.conf.AllowResumebak /etc/cups/cupsd.conf
 
 fi
 
 # Re-enable the CUPS service
-sudo launchctl load -w /System/Library/LaunchDaemons/org.cups.cupsd.plist</string>
+/bin/launchctl load -w /System/Library/LaunchDaemons/org.cups.cupsd.plist</string>
 	<key>uninstallable</key>
 	<true/>
 	<key>version</key>
