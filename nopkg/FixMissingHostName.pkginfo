@@ -31,7 +31,7 @@
 	<string>#!/bin/bash
 
 # See if there is a hostname set
-hostName=$(scutil --get HostName)
+hostName=$(/usr/sbin/scutil --get HostName)
 
 if [ -z "$hostName" ]; then
 
@@ -54,17 +54,17 @@ fi</string>
 	<string>#!/bin/bash
 
 # See if there is a hostname set
-hostName=$(scutil --get HostName)
+hostName=$(/usr/sbin/scutil --get HostName)
 
 if [ -z "$hostName" ]; then
 
    #echo "There is no hostname"
    
    # Get the computer name then
-   computerName=$(scutil --get ComputerName)
+   computerName=$(/usr/sbin/scutil --get ComputerName)
 
    # Set the host name to be the computer name
-   sudo scutil --set HostName "$computerName"
+   /usr/sbin/scutil --set HostName "$computerName"
 
 
 fi</string>
