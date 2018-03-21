@@ -31,7 +31,7 @@
 	<string>#!/bin/bash
 
 # Set up test variable
-testVariable=$(defaults read /Library/Preferences/com.oracle.java.Java-Updater JavaAutoUpdateEnabled)
+testVariable=$(/usr/bin/defaults read /Library/Preferences/com.oracle.java.Java-Updater JavaAutoUpdateEnabled)
 
 # See if it's disabled
 if [ "$testVariable" == "0" ]; then
@@ -53,7 +53,7 @@ fi</string>
 	<string>DisableJavaAutoUpdates</string>
 	<key>postinstall_script</key>
 	<string>#!/bin/bash
-sudo defaults write /Library/Preferences/com.oracle.java.Java-Updater JavaAutoUpdateEnabled -bool false</string>
+/usr/bin/defaults write /Library/Preferences/com.oracle.java.Java-Updater JavaAutoUpdateEnabled -bool false</string>
 	<key>unattended_install</key>
 	<true/>
 	<key>unattended_uninstall</key>
@@ -62,7 +62,7 @@ sudo defaults write /Library/Preferences/com.oracle.java.Java-Updater JavaAutoUp
 	<string>uninstall_script</string>
 	<key>uninstall_script</key>
 	<string>#!/bin/bash
-sudo defaults write /Library/Preferences/com.oracle.java.Java-Updater JavaAutoUpdateEnabled -bool true</string>
+/usr/bin/defaults write /Library/Preferences/com.oracle.java.Java-Updater JavaAutoUpdateEnabled -bool true</string>
 	<key>uninstallable</key>
 	<true/>
 	<key>update_for</key>
