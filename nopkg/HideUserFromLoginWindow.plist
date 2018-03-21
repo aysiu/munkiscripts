@@ -30,7 +30,7 @@
 	<key>installcheck_script</key>
 	<string>#!/bin/bash
 
-testVariable=$(dscl . -read /Users/NAMEOFUSERTOHIDE IsHidden)
+testVariable=$(/usr/bin/dscl . -read /Users/NAMEOFUSERTOHIDE IsHidden)
 
 if [ "$testVariable" == "dsAttrTypeNative:IsHidden: 1" ]; then
 
@@ -50,7 +50,7 @@ fi</string>
 	<string>#!/bin/bash
 
 # Hide the specific account from the login screen
-sudo dscl . create /Users/NAMEOFUSERTOHIDE IsHidden 1</string>
+/usr/bin/dscl . create /Users/NAMEOFUSERTOHIDE IsHidden -bool TRUE</string>
 	<key>unattended_install</key>
 	<true/>
 	<key>unattended_uninstall</key>
@@ -61,7 +61,7 @@ sudo dscl . create /Users/NAMEOFUSERTOHIDE IsHidden 1</string>
 	<string>#!/bin/bash
 
 # Unhide the specific account from the login screen
-sudo dscl . create /Users/NAMEOFUSERTOHIDE IsHidden 0</string>
+/usr/bin/dscl . create /Users/NAMEOFUSERTOHIDE IsHidden -bool FALSE</string>
 	<key>uninstallable</key>
 	<true/>
 	<key>version</key>
