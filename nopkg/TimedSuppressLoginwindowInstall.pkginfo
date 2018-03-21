@@ -31,7 +31,7 @@
 	<string>#!/bin/bash
 
 # Check to see if the setting exists
-settingCheck=$(defaults read /Library/Preferences/ManagedInstalls | grep  SuppressLoginwindowInstall)
+settingCheck=$(/usr/bin/defaults read /Library/Preferences/ManagedInstalls | /usr/bin/grep  SuppressLoginwindowInstall)
 
 if [ -z "$settingCheck" ]; then
 
@@ -41,7 +41,7 @@ if [ -z "$settingCheck" ]; then
 else
 
     # Get the suppress loginwindow setting
-    currentSetting=$(defaults read /Library/Preferences/ManagedInstalls SuppressLoginwindowInstall)
+    currentSetting=$(/usr/bin/defaults read /Library/Preferences/ManagedInstalls SuppressLoginwindowInstall)
 
 fi
 
@@ -90,16 +90,16 @@ fi</string>
 	<string>#!/bin/bash
 
 # Get the current hour of the day
-currentHour=$(date +"%H")
+currentHour=$(/bin/date +"%H")
 
 if [ "$currentHour" -lt 8 ]; then
     
         # Should be set to false
-        sudo defaults write /Library/Preferences/ManagedInstalls SuppressLoginwindowInstall -bool FALSE
+        /usr/bin/defaults write /Library/Preferences/ManagedInstalls SuppressLoginwindowInstall -bool FALSE
 
 else
         # Should be set to true
-        sudo defaults write /Library/Preferences/ManagedInstalls SuppressLoginwindowInstall -bool TRUE
+        /usr/bin/defaults write /Library/Preferences/ManagedInstalls SuppressLoginwindowInstall -bool TRUE
 
 fi</string>
 	<key>unattended_install</key>
