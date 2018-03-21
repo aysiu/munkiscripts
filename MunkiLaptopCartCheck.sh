@@ -5,14 +5,14 @@
 # NOTE: This Requires NoSleep https://github.com/integralpro/nosleep be installed with the "Command-Line Interface"
 
 #check system battery 
-battPercentage=$(pmset -g batt | grep "InternalBattery-0" | cut -c 21-23 | sed s/\%//)
+battPercentage=$(/usr/bin/pmset -g batt | /usr/bin/grep "InternalBattery-0" | /usr/bin/cut -c 21-23 | /usr/bin/sed s/\%//)
 
-echo "$(date) - Checking to see if the battery level is enough to run updates." >> /Library/Logs/MunkiLaptopCart.log
+/bin/echo "$(/bin/date) - Checking to see if the battery level is enough to run updates." >> /Library/Logs/MunkiLaptopCart.log
 
 # Make sure the battery percentage is greater than 50
 if [ "$battPercentage" -gt 50 ] ; then
 
-	echo "$(date) - Battery level enough at $battPercentage. Checking to ping the Munki server." >> /Library/Logs/MunkiLaptopCart.log
+	/bin/echo "$(/bin/date) - Battery level enough at $battPercentage. Checking to ping the Munki server." >> /Library/Logs/MunkiLaptopCart.log
 		
 	#wait until we can talk to munki server before continuing
 	until /sbin/ping -c 1 -t 90 munki.siprep.org; do /sbin/sleep 3; done
@@ -21,11 +21,11 @@ if [ "$battPercentage" -gt 50 ] ; then
 	/usr/local/munki/managedsoftwareupdate --auto
 			
 	# Write to the log
-	echo "$(date) - Munki run." >> /Library/Logs/MunkiLaptopCart.log
+	/bin/echo "$(/bin/date) - Munki run." >> /Library/Logs/MunkiLaptopCart.log
 			
 else
 	# Write to the log
-	echo "$(date) - Battery too low at $battPercentage to run Munki updates." >> /Library/Logs/MunkiLaptopCart.log
+	/bin/echo "$(/bin/date) - Battery too low at $battPercentage to run Munki updates." >> /Library/Logs/MunkiLaptopCart.log
 
 fi	
 
