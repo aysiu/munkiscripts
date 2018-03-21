@@ -17,7 +17,7 @@ if [[ -f "$plist" ]]; then
 		expect eof")
 
 	# See if the output contains the word "true"
-	output_test=$(echo "$output" | grep "true")
+	output_test=$(/bin/echo "$output" | /usr/bin/grep "true")
 
 	if [[ -z "$output_test" ]]; then
 
