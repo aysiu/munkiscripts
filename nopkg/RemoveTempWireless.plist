@@ -40,13 +40,13 @@ else
    # Find the wireless network hardware port name
    # Code to get next line after "Wi-Fi" is from http://superuser.com/a/298125
    # Code to get only the text after "Device: " is from http://unix.stackexchange.com/a/24151
-   wifiport=$(networksetup -listallhardwareports | grep -A1 "Wi-Fi" | sed -n -e 's/^.*Device: //p')
+   wifiport=$(/usr/sbin/networksetup -listallhardwareports | /usr/bin/grep -A1 "Wi-Fi" | /usr/bin/sed -n -e 's/^.*Device: //p')
 
 	# If it's not empty...
 	if [ ! -z "$wifiport" ]; then 
 
       # See if tempSSID is in the preferred networks
-      tempInPreferred=$(networksetup -listpreferredwirelessnetworks "$wifiport" | grep "$tempSSID")
+      tempInPreferred=$(/usr/sbin/networksetup -listpreferredwirelessnetworks "$wifiport" | /usr/bin/grep "$tempSSID")
 
       # Temp wireless is in the preferred list
       if [ ! -z "$tempInPreferred" ]; then
@@ -97,7 +97,7 @@ tempSSID='SSIDYOUWANTREMOVEDAFTERMUNKIBOOTSTRAPISDONE'
 # Find the wireless network hardware port name
 # Code to get next line after "Wi-Fi" is from http://superuser.com/a/298125
 # Code to get only the text after "Device: " is from http://unix.stackexchange.com/a/24151
-wifiport=$(networksetup -listallhardwareports | grep -A1 "Wi-Fi" | sed -n -e 's/^.*Device: //p')
+wifiport=$(/usr/sbin/networksetup -listallhardwareports | /usr/bin/grep -A1 "Wi-Fi" | /usr/bin/sed -n -e 's/^.*Device: //p')
 
 # Remove the temporary SSID
 networksetup -removepreferredwirelessnetwork "$wifiport" "$tempSSID"
@@ -106,7 +106,7 @@ networksetup -removepreferredwirelessnetwork "$wifiport" "$tempSSID"
 # /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -z will disconnect from any connected network, but then you'll have to manually connect to another favorite network.
 
 # Toggle wireless to just have an automatic scan and reconnect to a remaining favorite
-networksetup -setairportpower "$wifiport" off &amp;&amp; sleep 3 &amp;&amp; networksetup -setairportpower "$wifiport" on</string>
+/usr/sbin/networksetup -setairportpower "$wifiport" off &amp;&amp; /bin/sleep 3 &amp;&amp; /usr/sbin/networksetup -setairportpower "$wifiport" on</string>
 	<key>unattended_install</key>
 	<true/>
 	<key>version</key>
