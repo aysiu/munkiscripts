@@ -33,12 +33,12 @@ Assumes you may have created a revised Munki check at one point: http://technolo
 	<string>#!/bin/bash
 
 # Check to see if the revised is running
-revised=$(sudo launchctl list | grep com.googlecode.munki.managedsoftwareupdate-check.revised)
+revised=$(/bin/launchctl list | /usr/bin/grep com.googlecode.munki.managedsoftwareupdate-check.revised)
 
 if [ -z "$revised" ]; then
    
    # Okay, so the revised launchdaemon isn't running... is the normal one running?
-   normal=$(launchctl list | grep com.googlecode.munki.managedsoftwareupdate-check)
+   normal=$(/bin/launchctl list | /usr/bin/grep com.googlecode.munki.managedsoftwareupdate-check)
 
    if [ -z "$normal" ]; then
       # If the normal isn't running, this isn't installed
@@ -70,19 +70,19 @@ fi</string>
 revisedLocation='/Library/LaunchDaemons/com.googlecode.munki.managedsoftwareupdate-check.revised.plist'
 
 # Check to see if the revised is running
-revisedRunning=$(sudo launchctl list | grep com.googlecode.munki.managedsoftwareupdate-check.revised)
+revisedRunning=$(/bin/launchctl list | /usr/bin/grep com.googlecode.munki.managedsoftwareupdate-check.revised)
 
 if [ ! -z "$revisedRunning" ]; then
    # If the revised is running, shut it off
-   sudo launchctl unload "$revisedLocation"
+   /bin/launchctl unload "$revisedLocation"
    
    # Let's also delete it
-   sudo rm "$revisedLocation"
+   /bin/rm "$revisedLocation"
    
 fi
 
 # Either way, we have to make sure the normal launch daemon is running
-sudo launchctl load -w '/Library/LaunchDaemons/com.googlecode.munki.managedsoftwareupdate-check.plist'</string>
+/bin/launchctl load -w '/Library/LaunchDaemons/com.googlecode.munki.managedsoftwareupdate-check.plist'</string>
 	<key>unattended_install</key>
 	<true/>
 	<key>version</key>
