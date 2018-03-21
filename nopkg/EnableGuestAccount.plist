@@ -36,7 +36,7 @@
 
 # Does guest already exist?
 if [ -f /var/db/dslocal/nodes/Default/users/Guest.plist ]; then
-	#echo "Guest already created!"
+	# /bin/echo "Guest already created!"
 	exit 1
 	
 	else
@@ -86,7 +86,7 @@ sleep 2
 			
 # This seems to be technically unnecessary; it controls whether the "Allow 
 # guests to log in to this computer" checkbox is enabled in SysPrefs 
-defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -bool TRUE</string>
+/usr/bin/defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -bool TRUE</string>
 	<key>unattended_install</key>
 	<true/>
 	<key>uninstall_method</key>
@@ -102,7 +102,7 @@ defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -bool TRU
 /usr/bin/security delete-generic-password -a Guest -s com.apple.loginwindow.guest-account -D "application password" /Library/Keychains/System.keychain
 
 # Also-do we need this still? (Should un-tick the box)
-defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -bool FALSE</string>
+/usr/bin/defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -bool FALSE</string>
 	<key>uninstallable</key>
 	<true/>
 	<key>version</key>
