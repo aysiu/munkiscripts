@@ -35,11 +35,11 @@
 # Code to get only the text after "Device: " is from http://unix.stackexchange.com/a/24151
 wifiport=$(/usr/sbin/networksetup -listallhardwareports | /usr/bin/grep -A1 "Wi-Fi" | /usr/bin/sed -n -e 's/^.*Device: //p')
 
-desiredwireless=$(networksetup -listpreferredwirelessnetworks "$wifiport" | grep "NAMEOFDESIREDWIRELESSNETWORK")
+desiredwireless=$(/usr/sbin/networksetup -listpreferredwirelessnetworks "$wifiport" | /usr/bin/grep "NAMEOFDESIREDWIRELESSNETWORK")
 
-undesiredwireless1=$(networksetup -listpreferredwirelessnetworks "$wifiport" | grep "NAMEOFUNDESIREDWIRELESS1")
+undesiredwireless1=$(/usr/sbin/networksetup -listpreferredwirelessnetworks "$wifiport" | /usr/bin/grep "NAMEOFUNDESIREDWIRELESS1")
 
-undesiredwireless2=$(networksetup -listpreferredwirelessnetworks "$wifiport" | grep "NAMEOFUNDESIREDWIRELESS2")
+undesiredwireless2=$(/usr/sbin/networksetup -listpreferredwirelessnetworks "$wifiport" | /usr/bin/grep "NAMEOFUNDESIREDWIRELESS2")
 
 if [ -z "$desiredwireless" ]; then
    # It's "installed," because we can't remove the other networks... desired wireless has to be on there first
@@ -74,7 +74,7 @@ function deletePreferred {
    wirelesstest=$(networksetup -listpreferredwirelessnetworks "$wifiport" | grep "$1")
    # If it is, remove it
    if [ ! -z "$wirelesstest" ]; then
-      sudo networksetup -removepreferredwirelessnetwork "$wifiport" "$1"
+      /usr/sbin/networksetup -removepreferredwirelessnetwork "$wifiport" "$1"
    fi
 }
 
@@ -82,7 +82,7 @@ deletePreferred "NAMEOFUNDESIREDWIRELESS1"
 deletePreferred "NAMEOFUNDESIREDWIRELESS2"
 
 # Toggle wireless to just have an automatic scan and reconnect to a remaining favorite
-networksetup -setairportpower "$wifiport" off &amp;&amp; sleep 3 &amp;&amp; networksetup -setairportpower "$wifiport" on</string>
+/usr/sbin/networksetup -setairportpower "$wifiport" off &amp;&amp; /bin/sleep 3 &amp;&amp; /usr/sbin/networksetup -setairportpower "$wifiport" on</string>
 	<key>unattended_install</key>
 	<true/>
 	<key>version</key>
