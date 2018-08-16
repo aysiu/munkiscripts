@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2018-08-16T17:03:49Z</date>
+		<key>munki_version</key>
+		<string>3.3.1.3537</string>
+		<key>os_version</key>
+		<string>10.13.6</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>description</key>
+	<string>Cleans out issues that DetectX has identified</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>DetectX Clean</string>
+	<key>installcheck_script</key>
+	<string>#!/usr/bin/python
+
+import json
+import os
+import sys
+
+# Just to be extra safe, specify an array of things that are okay to delete
+okay_to_delete = [ 'SOMEFULLPATHTOAFILE', 'SOMEFULLPATHTOANOTHERFILE', 'SOMEFULLPATHTOYETANOTHERFILE' ]
+
+with open('/usr/local/munki/preflight.d/cache/detectx.json') as f:
+        data = json.load(f)
+
+installed=1
+
+if data['issues']:
+        for issue in data['issues']:
+                if os.path.exists(issue):
+                        if issue in okay_to_delete and installed==1:
+							installed=0
+
+if installed==1:
+	sys.exit(1)
+else:
+	sys.exit(0)</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>DetectXClean</string>
+	<key>postinstall_script</key>
+	<string>#!/usr/bin/python
+
+import json
+import os
+from shutil import copyfile
+import subprocess
+import time
+
+# Just to be extra safe, specify an array of things that are okay to delete
+okay_to_delete = [ 'SOMEFULLPATHTOAFILE', 'SOMEFULLPATHTOANOTHERFILE', 'SOMEFULLPATHTOYETANOTHERFILE' ]
+
+cached_json='/usr/local/munki/preflight.d/cache/detectx.json'
+
+with open(cached_json) as f:
+        data = json.load(f)
+
+if data['issues']:
+        # Copy log file
+        timestr = time.strftime("%Y%m%d%H%M%S")
+        destination = '/var/log/detectx' + timestr + '.json'
+        copyfile(cached_json, destination)
+
+
+        for issue in data['issues']:
+                if os.path.exists(issue):
+                        if issue in okay_to_delete:
+                            print 'Removing %s' % issue
+                            cmd = [ '/bin/rm', '-rf', issue]
+                            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                        else:
+                            print '%s exists but isn\'t in the okay-to-delete array yet'
+                else:
+                        print '%s does not exist any more' % issue
+else:
+        print 'No issues'</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
