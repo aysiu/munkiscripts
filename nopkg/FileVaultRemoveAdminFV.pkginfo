@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>catalog_promotion_date</key>
+		<string>2018-07-02</string>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2018-06-21T22:40:28Z</date>
+		<key>munki_version</key>
+		<string>3.3.0.3515</string>
+		<key>os_version</key>
+		<string>10.13.5</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>description</key>
+	<string>Removes the admin user from the list of FileVault-enabled users if there’s another FV-enabled user already.</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>FileVault Remove Admin User</string>
+	<key>icon_name</key>
+	<string>silogo.png</string>
+	<key>installcheck_script</key>
+	<string>#!/bin/bash
+
+# Find out if there is an fv-enabled user who isn't admin or null
+fv_user_test=$(/usr/bin/fdesetup list | grep -v SHORTNAMEOFADMIN | grep -v null)
+
+# If it comes back blank...
+if [[ -z "$fv_user_test" ]]; then
+	# Might as well consider it installed, because there's nothing to do. The only FV-enabled user is admin.
+	exit 1
+
+else
+	# Find out if there is an admin account also fv-enabled
+	fv_admin_test=$(/usr/bin/fdesetup list | grep SHORTNAMEOFADMIN)
+
+	if [[ -z "$fv_admin_test" ]]; then
+		# It's installed because there is an fv-enabled user who isn't admin, but there is no fv-enabled user who is admin
+		exit 1
+	else
+		# It's not installed, because there is an fv-enabled user who isn't admin, but there is still an fv-enabled user who is admin
+		exit 0
+
+	fi
+fi</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>FileVaultRemoveAdmin</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/bash
+
+# Remove admin from fv-enabled users
+/usr/bin/fdesetup remove -user SHORTNAMEOFADMINUSER</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>update_for</key>
+	<array>
+		<string>Crypt2</string>
+	</array>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
