@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2018-12-06T17:39:11Z</date>
+		<key>munki_version</key>
+		<string>3.6.0.3663</string>
+		<key>os_version</key>
+		<string>10.14.2</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>description</key>
+	<string>Schedules the computer to boot up early in the morning and shutdown late at night.</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>Scheduled Wake Shutdown</string>
+	<key>installcheck_script</key>
+	<string>#!/bin/bash
+
+wake_test=$(/usr/bin/pmset -g sched | /usr/bin/grep "wakepoweron at 4:00AM every day")
+shutdown_test=$(/usr/bin/pmset -g sched | /usr/bin/grep "shutdown at 10:00PM every day")
+
+# Make sure both tests don't come back blank
+if [[ -z "$wake_test" ]] || [[ -z "$shutdown_test" ]]; then
+
+	# Not installed
+	exit 0
+
+else
+
+	# Installed
+	exit 1
+
+fi</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>ScheduledWakeShutdown</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/bash
+
+# Make sure the computer boots up at 4:00 AM and shuts down at 10:00 PM
+/usr/bin/pmset repeat shutdown MTWRFSU 22:00:00 wakeorpoweron MTWRFSU 4:00:00</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>unattended_uninstall</key>
+	<true/>
+	<key>uninstall_method</key>
+	<string>uninstall_script</string>
+	<key>uninstall_script</key>
+	<string>#!/bin/bash
+
+# Remove repeating schedule
+/usr/bin/pmset repeat cancel</string>
+	<key>uninstallable</key>
+	<true/>
+	<key>update_for</key>
+	<array>
+		<string>EveningLogoutReboot</string>
+	</array>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
