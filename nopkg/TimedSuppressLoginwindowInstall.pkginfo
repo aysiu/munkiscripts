@@ -48,12 +48,12 @@ fi
 # Get the current hour of the day
 currentHour=$(date +"%H")
 
-# The setting should be on after 8:00 AM
+# The setting should be on after 6:00 AM
 # So check first if the setting is on
 if [ "$currentSetting" == 1 ]; then
 
-    # This isn't okay if it's before 8:00 AM
-    if [ "$currentHour" -lt 8 ]; then
+    # This isn't okay if it's before 6:00 AM
+    if [ "$currentHour" -lt 6 ]; then
     
         # Not installed
         exit 0
@@ -67,8 +67,8 @@ if [ "$currentSetting" == 1 ]; then
 # SuppressLoginwindowInstall is off, so let's check whether that's okay or not
 else
 
-    # This is okay if it's before 8:00 AM
-    if [ "$currentHour" -lt 8 ]; then
+    # This is okay if it's before 6:00 AM
+    if [ "$currentHour" -lt 6 ]; then
     
         # Installed
         exit 1
@@ -92,7 +92,7 @@ fi</string>
 # Get the current hour of the day
 currentHour=$(/bin/date +"%H")
 
-if [ "$currentHour" -lt 8 ]; then
+if [ "$currentHour" -lt 6 ]; then
     
         # Should be set to false
         /usr/bin/defaults write /Library/Preferences/ManagedInstalls SuppressLoginwindowInstall -bool FALSE
