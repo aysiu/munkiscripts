@@ -58,6 +58,10 @@ update_to_ignore='macOS Catalina'
 /usr/sbin/softwareupdate --ignore "$update_to_ignore"</string>
 	<key>unattended_install</key>
 	<true/>
+    <key>unattended_uninstall</key>
+    <true/>
+    <key>uninstallable</key>
+    <true/>
 	<key>uninstall_method</key>
 	<string>uninstall_script</string>
 	<key>uninstall_script</key>
