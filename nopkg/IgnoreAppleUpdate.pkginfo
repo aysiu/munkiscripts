@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2019-10-12T04:30:30Z</date>
+		<key>munki_version</key>
+		<string>3.6.3.3784</string>
+		<key>os_version</key>
+		<string>10.14.6</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>installcheck_script</key>
+	<string>#!/bin/bash
+
+# Update you want to check to see that is ignored
+update_to_ignore='macOS Catalina'
+
+# Check to see whether the update to ignore is in the Inactive Updates
+ignore_check=$(/usr/bin/defaults read /Library/Preferences/com.apple.SoftwareUpdate InactiveUpdates | /usr/bin/grep "$update_to_ignore")
+
+# See if the check is empty
+if [[ -z "$ignore_check" ]]; then
+    /bin/echo "Ignoring of $update_to_ignore is not installed"
+    exit 0
+else
+    /bin/echo "Ignoring of $update_to_ignore is installed"
+    exit 1
+fi</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>IgnoreAppleUpdate</string>
+	<key>display_name</key>
+	<string>Ignore Catalina Upgrade</string>
+	<key>developer</key>
+	<string>Alan Siu</string>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/bash
+
+# Update you want to check to see that is ignored
+update_to_ignore='macOS Catalina'
+
+# Ignore it
+/usr/sbin/softwareupdate --ignore "$update_to_ignore"</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>uninstall_method</key>
+	<string>uninstall_script</string>
+	<key>uninstall_script</key>
+	<string>#!/usr/bin/python
+
+import subprocess
+
+# Update you want to no longer ignore
+update_to_ignore = 'macOS Catalina'
+
+# As far as I can tell, there isn't a way to just stop ignoring one update. Yes, it's highly unlike that a Mac admin will have multiple updates to ignore, but this is a lot cleaner to preserve other ignored updates while no longer ignoring the one specified in this nopkg
+
+# Output to disregard
+disregard = [ "(",
+    ")",
+    update_to_ignore]
+
+# Updates to keep ignoring
+restore_ignore = []
+
+# Get the currently ignored updates
+currently_ignored = subprocess.check_output(['/usr/bin/defaults', 'read', '/Library/Preferences/com.apple.SoftwareUpdate', 'InactiveUpdates'])
+
+# Parse the output
+for line in currently_ignored.splitlines():
+    # Take out the whitespace and the extra comma at the end if there is one
+    ignored_update=line.strip().replace(",","").replace('"', '')
+    # If the update (or line) is not in what to disregard...
+    if ignored_update not in disregard:
+        # ... then mark it to be restored to updates to ignore
+        restore_ignore.append(ignored_update)
+
+# Reset ignored updates
+subprocess.call(["/usr/sbin/softwareupdate", "--reset-ignored"])
+
+# Keep ignoring any other updates that were ignored before
+if restore_ignore:
+    for ignored_update in restore_ignore:
+        subprocess.call(["/usr/sbin/softwareupdate", "--ignore", ignored_update])</string>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
