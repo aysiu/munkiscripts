@@ -19,6 +19,12 @@
 	<array>
 		<string>testing</string>
 	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>developer</key>
+	<string>Alan Siu</string>
+	<key>display_name</key>
+	<string>Ignore Catalina Upgrade</string>
 	<key>installcheck_script</key>
 	<string>#!/bin/bash
 
@@ -42,12 +48,6 @@ fi</string>
 	<string>10.4.0</string>
 	<key>name</key>
 	<string>IgnoreAppleUpdate</string>
-	<key>display_name</key>
-	<string>Ignore Catalina Upgrade</string>
-	<key>developer</key>
-	<string>Alan Siu</string>
-	<key>category</key>
-	<string>Scripts</string>
 	<key>postinstall_script</key>
 	<string>#!/bin/bash
 
@@ -58,10 +58,8 @@ update_to_ignore='macOS Catalina'
 /usr/sbin/softwareupdate --ignore "$update_to_ignore"</string>
 	<key>unattended_install</key>
 	<true/>
-    <key>unattended_uninstall</key>
-    <true/>
-    <key>uninstallable</key>
-    <true/>
+	<key>unattended_uninstall</key>
+	<true/>
 	<key>uninstall_method</key>
 	<string>uninstall_script</string>
 	<key>uninstall_script</key>
@@ -70,25 +68,32 @@ update_to_ignore='macOS Catalina'
 import subprocess
 
 # Update you want to no longer ignore
-update_to_ignore = 'macOS Catalina'
+update_to_ignore = "macOS Catalina"
 
-# As far as I can tell, there isn't a way to just stop ignoring one update. Yes, it's highly unlike that a Mac admin will have multiple updates to ignore, but this is a lot cleaner to preserve other ignored updates while no longer ignoring the one specified in this nopkg
+# As far as I can tell, there isn't a way to just stop ignoring one update. Yes, it's highly
+# unlikely that a Mac admin will have multiple updates to ignore, but this is a lot cleaner to
+# preserve other ignored updates while no longer ignoring the one specified in this nopkg
 
 # Output to disregard
-disregard = [ "(",
-    ")",
-    update_to_ignore]
+disregard = ["(", ")", update_to_ignore]
 
 # Updates to keep ignoring
 restore_ignore = []
 
 # Get the currently ignored updates
-currently_ignored = subprocess.check_output(['/usr/bin/defaults', 'read', '/Library/Preferences/com.apple.SoftwareUpdate', 'InactiveUpdates'])
+currently_ignored = subprocess.check_output(
+    [
+        "/usr/bin/defaults",
+        "read",
+        "/Library/Preferences/com.apple.SoftwareUpdate",
+        "InactiveUpdates",
+    ]
+)
 
 # Parse the output
 for line in currently_ignored.splitlines():
     # Take out the whitespace and the extra comma at the end if there is one
-    ignored_update=line.strip().replace(",","").replace('"', '')
+    ignored_update = line.strip().replace(",", "").replace('"', "")
     # If the update (or line) is not in what to disregard...
     if ignored_update not in disregard:
         # ... then mark it to be restored to updates to ignore
@@ -101,6 +106,8 @@ subprocess.call(["/usr/sbin/softwareupdate", "--reset-ignored"])
 if restore_ignore:
     for ignored_update in restore_ignore:
         subprocess.call(["/usr/sbin/softwareupdate", "--ignore", ignored_update])</string>
+	<key>uninstallable</key>
+	<true/>
 	<key>version</key>
 	<string>1.0</string>
 </dict>
