@@ -121,9 +121,6 @@ if os.path.isdir(manifests_directory) and os.access(manifests_directory, os.W_OK
 		for serial,display_name in manifests_to_create.items():
 			write_manifest(serial, display_name, manifest_catalogs, manifests_to_include)
 
-	# Remind the user of makecatalogs
-	print "\nDon't forget to run /usr/local/munki/makecatalogs after you're done making manifests"
-
 else:
 	print >> sys.stderr, ("ERROR: Manifest directory doesn't exist or isn't writeable")
 	sys.exit(1)
