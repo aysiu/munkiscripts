@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2020-03-03T20:00:00Z</date>
+		<key>munki_version</key>
+		<string>4.0.0.3881</string>
+		<key>os_version</key>
+		<string>10.15.3</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>blocking_applications</key>
+	<array>
+		<string>Google Chrome.app</string>
+	</array>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>developer</key>
+	<string>Alan Siu</string>
+	<key>display_name</key>
+	<string>Disable Chrome Text Fragment Anchor</string>
+	<key>installcheck_script</key>
+	<string>#!/usr/local/munki/python
+
+import json
+import os
+import pwd
+import sys
+
+def chrome_state():
+
+    # Lab to enable
+    lab_to_enable = "enable-text-fragment-anchor@2"
+
+    # Define accounts to discount
+    exemptusers = ["adminaccount"]
+
+    # Get local user accounts
+    localusers = [p for p in pwd.getpwall() if p.pw_dir.startswith("/Users/")]
+
+    # Set up test variable
+    changes_needed = 0
+
+    # Loop through the local users
+    for u in localusers:
+        # Exclude exempt users.
+        if u.pw_name not in exemptusers:
+            # Define what the path is to the Chrome Local State file
+            local_state = os.path.join("/Users", u.pw_name, "Library/Application Support/Google/Chrome/Local State")
+            # Double-check that the path exists
+            if os.path.exists(local_state):
+                # Parse the json
+                with open(local_state) as data_file:
+                    state_data = json.load(data_file)
+                    # Double-check labs experiments is a key in browser
+                    if "enabled_labs_experiments" in state_data["browser"].keys():
+                        enabled_labs_experiments = state_data["browser"]["enabled_labs_experiments"]
+                        # Loop through each of the user accounts in Chrome
+                        if lab_to_enable in state_data["browser"]["enabled_labs_experiments"]:
+                            print("{} already in Enabled Labs Experiments".format(lab_to_enable))
+                        else:
+                            print("{} not in enabled labs experiments".format(lab_to_enable))
+                            changes_needed = 1
+                    else:
+                        print("No enabled labs experiments. Need to add {}.".format(lab_to_enable))
+                        changes_needed = 1
+    if changes_needed == 1:
+        sys.exit(0)
+    else:
+        sys.exit(1)
+
+if __name__ == "__main__":
+  chrome_state()
+</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>disable_chrome_text_fragment_anchor</string>
+	<key>postinstall_script</key>
+	<string>#!/usr/local/munki/python
+
+import json
+import os
+import pwd
+
+def chrome_state():
+
+    # Lab to enable
+    lab_to_enable = "enable-text-fragment-anchor@2"
+
+    # Define accounts to discount
+    exemptusers = ["adminaccount"]
+
+    # Get local user accounts
+    localusers = [p for p in pwd.getpwall() if p.pw_dir.startswith("/Users/")]
+
+    # Loop through the local users
+    for u in localusers:
+        # Exclude exempt users.
+        if u.pw_name not in exemptusers:
+            # Define what the path is to the Chrome Local State file
+            local_state = os.path.join("/Users", u.pw_name, "Library/Application Support/Google/Chrome/Local State")
+            # Double-check that the path exists
+            if os.path.exists(local_state):
+                # Initialize test variable
+                changes_made = 0
+                # Parse the json
+                with open(local_state) as data_file:
+                    state_data = json.load(data_file)
+                    # Double-check labs experiments is a key in browser
+                    if "enabled_labs_experiments" in state_data["browser"].keys():
+                        enabled_labs_experiments = state_data["browser"]["enabled_labs_experiments"]
+                        # Loop through each of the user accounts in Chrome
+                        if lab_to_enable in state_data["browser"]["enabled_labs_experiments"]:
+                            print("{} already in Enabled Labs Experiments".format(lab_to_enable))
+                        else:
+                            print("{} not in enabled labs experiments".format(lab_to_enable))
+                            enabled_labs_experiments.append(lab_to_enable)
+                            changes_made = 1
+                    else:
+                        enabled_labs_experiments = [ lab_to_enable ]
+                        print("No enabled labs experiments. Need to add {}.".format(lab_to_enable))
+                        changes_made = 1
+                if changes_made == 1:
+                    state_data["browser"]["enabled_labs_experiments"] = enabled_labs_experiments
+                    with open(local_state, "w") as modify_file:
+                        json.dump(state_data, modify_file)
+                    # Make sure the user the owner of the modified file
+                    os.chown(local_state, u.pw_uid, u.pw_gid)
+
+if __name__ == "__main__":
+  chrome_state()
+</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>update_for</key>
+	<array>
+		<string>GoogleChrome</string>
+	</array>
+	<key>version</key>
+	<string>1.1</string>
+</dict>
+</plist>
