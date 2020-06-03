@@ -11,7 +11,7 @@
 	<key>category</key>
 	<string>Scripts</string>
 	<key>description</key>
-	<string>Sets macOS updates to install automatically. When uninstalled, sets macOS updates to not install automatically.</string>
+	<string>Sets macOS updates to not install automatically. When uninstalled, sets macOS updates to install automatically.</string>
 	<key>developer</key>
 	<string>aysiu</string>
 	<key>display_name</key>
