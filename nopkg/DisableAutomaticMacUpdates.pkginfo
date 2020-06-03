@@ -15,7 +15,7 @@
 	<key>developer</key>
 	<string>aysiu</string>
 	<key>display_name</key>
-	<string>Automatic macOS Updates</string>
+	<string>Disable Automatic macOS Updates</string>
 	<key>installcheck_script</key>
 	<string>#!/bin/zsh
 
@@ -27,18 +27,18 @@ macosupdates=$(/usr/bin/defaults read /Library/Preferences/com.apple.SoftwareUpd
 # See if any of the settings are currently set to true
 if [[ "$configdatainstall" == 1 || "$criticalupdate" == 1 || "$macosupdates" == 1 ]]; then
     /bin/echo "Automatic updates are enabled."
-    exit 1
+    exit 0
 else
     /bin/echo "Automatic updates are not enabled."
-    exit 0
+    exit 1
 fi</string>
 	<key>installer_type</key>
 	<string>nopkg</string>
 	<key>minimum_os_version</key>
 	<string>10.4.0</string>
 	<key>name</key>
-	<string>AutomaticMacUpdates</string>
-	<key>postinstall_script</key>
+	<string>DisableAutomaticMacUpdates</string>
+	<key>uninstall_script</key>
 	<string>#!/bin/zsh
 
 /bin/echo "Enabling automatic macOS updates"
@@ -52,7 +52,7 @@ fi</string>
 	<true/>
 	<key>uninstall_method</key>
 	<string>uninstall_script</string>
-	<key>uninstall_script</key>
+	<key>postinstall_script</key>
 	<string>#!/bin/zsh
 
 /bin/echo "Disabling automatic macOS updates"
