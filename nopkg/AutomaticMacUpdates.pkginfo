@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>description</key>
+	<string>Sets macOS updates to install automatically. When uninstalled, sets macOS updates to not install automatically.</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>Automatic macOS Updates</string>
+	<key>installcheck_script</key>
+	<string>#!/bin/zsh
+
+# Get current settings
+configdatainstall=$(/usr/bin/defaults read /Library/Preferences/com.apple.SoftwareUpdate.plist ConfigDataInstall)
+criticalupdate=$(/usr/bin/defaults read /Library/Preferences/com.apple.SoftwareUpdate.plist CriticalUpdateInstall)
+macosupdates=$(/usr/bin/defaults read /Library/Preferences/com.apple.SoftwareUpdate.plist AutomaticallyInstallMacOSUpdates)
+
+# See if any of the settings are currently set to true
+if [[ "$configdatainstall" == 1 || "$criticalupdate" == 1 || "$macosupdates" == 1 ]]; then
+    /bin/echo "Automatic updates are enabled."
+    exit 1
+else
+    /bin/echo "Automatic updates are not enabled."
+    exit 0
+fi</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>AutomaticMacUpdates</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/zsh
+
+/bin/echo "Enabling automatic macOS updates"
+# Get current settings
+/usr/bin/defaults read /Library/Preferences/com.apple.SoftwareUpdate.plist ConfigDataInstall -bool TRUE
+/usr/bin/defaults read /Library/Preferences/com.apple.SoftwareUpdate.plist CriticalUpdateInstall -bool TRUE
+/usr/bin/defaults read /Library/Preferences/com.apple.SoftwareUpdate.plist AutomaticallyInstallMacOSUpdates -bool TRUE</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>unattended_uninstall</key>
+	<true/>
+	<key>uninstall_method</key>
+	<string>uninstall_script</string>
+	<key>uninstall_script</key>
+	<string>#!/bin/zsh
+
+/bin/echo "Disabling automatic macOS updates"
+# Get current settings
+/usr/bin/defaults read /Library/Preferences/com.apple.SoftwareUpdate.plist ConfigDataInstall -bool FALSE
+/usr/bin/defaults read /Library/Preferences/com.apple.SoftwareUpdate.plist CriticalUpdateInstall -bool FALSE
+/usr/bin/defaults read /Library/Preferences/com.apple.SoftwareUpdate.plist AutomaticallyInstallMacOSUpdates -bool FALSE</string>
+	<key>uninstallable</key>
+	<true/>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
