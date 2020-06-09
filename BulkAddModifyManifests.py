@@ -1,6 +1,7 @@
 #!/usr/local/munki/python
 
 import argparse
+import copy
 import csv
 import os
 import plistlib
@@ -37,7 +38,10 @@ def list_from_string(in_string):
 
 def get_options():
     parser = argparse.ArgumentParser(description='Generate/modifies manifests from serial numbers in a CSV.')
-    parser.add_argument('--csv', help='Path to CSV file. Columns: 1, serial; 2, username; 3, display name', required=True)
+    parser.add_argument('--every', help='Modify all serial manifests. Most useful for mass-removals, \
+                        because there is no user / display name option.', action='store_true')
+    parser.add_argument('--csv', help='Path to CSV file. Columns: 1, serial; 2, username; 3, display name. \
+                        Takes precedence over the --every flag.')
     parser.add_argument('--addcatalogs', help='Catalogs to add, separated by commas.')
     parser.add_argument('--removecatalogs', help='Catalogs to remove, separated by commas.')
     parser.add_argument('--addmanifests', help='Manifests to add, separated by commas.')
@@ -54,8 +58,12 @@ def get_options():
     args = parser.parse_args()
     if args.csv:
         csvin = args.csv
+        every = False
+    elif args.every:
+        csvin = False
+        every = args.every
     else:
-        print("ERROR: Missing --csv")
+        print("ERROR: You must use either the --csv or --every flag")
         sys.exit(1)
     if args.addcatalogs:
         addcatalogs = list_from_string(args.addcatalogs)
@@ -109,7 +117,9 @@ def get_options():
         removefeatured = list_from_string(args.removefeatured)
     else:
         removefeatured = False
-    return csvin, addcatalogs, removecatalogs, addmanifests, removemanifests, addnotes, addinstalls, removeinstalls, adduninstalls, removeuninstalls, addoptionals, removeoptionals, addfeatured, removefeatured
+    return csvin, every, addcatalogs, removecatalogs, addmanifests, removemanifests, addnotes,
+                        addinstalls, removeinstalls, adduninstalls, removeuninstalls, addoptionals,
+                        removeoptionals, addfeatured, removefeatured
 
 def clean_username(dirty_username):
     if '@' in dirty_username:
@@ -122,20 +132,21 @@ def clean_username(dirty_username):
 def add_to_array(add_list, array, array_key):
     if array_key not in array.keys():
         array[array_key] = []
-    if add_list:
-        for add_item in add_list:
-            if add_item not in array[array_key]:
-                array[array_key].append(add_item)
+    for add_item in add_list:
+        if add_item not in array[array_key]:
+            array[array_key].append(add_item)
     return array
 
 def remove_from_array(remove_list, array, array_key):
-    if array_key in array.keys() and remove_list:
+    if array_key in array.keys():
         for remove_item in remove_list:
             if remove_item in array[array_key]:
                 array[array_key].remove(remove_item)
     return array
 
-def modify_manifest(serial, username, display_name, addcatalogs, removecatalogs, addmanifests, removemanifests, addnotes, addinstalls, removeinstalls, adduninstalls, removeuninstalls, addoptionals, removeoptionals, addfeatured, removefeatured):
+def modify_manifest(serial, username, display_name, addcatalogs, removecatalogs, addmanifests,
+                    removemanifests, addnotes, addinstalls, removeinstalls, adduninstalls,
+                    removeuninstalls, addoptionals, removeoptionals, addfeatured, removefeatured):
     # Create location to save manifest to
     manifest_location = os.path.join(manifests_directory, serial)
 
@@ -160,23 +171,25 @@ def modify_manifest(serial, username, display_name, addcatalogs, removecatalogs,
         # Initialize dictionary of XML content
         manifest_content = {}
 
+    # Write back changes only if it's changed, so let's keep track of what was originally there
+    original_manifest_content = copy.deepcopy(manifest_content)
+
     # We don't want to quit out just because we weren't able to open/read one manifest, so let's proceed if we can proceed.
     if proceed_okay == 0:
         print("WARNING: Skipping {}".format(serial))
     else:
-        # Loop through the catalogs
-        if 'catalogs' not in manifest_content.keys():
-            original_catalogs = []
-        else:
-            original_catalogs = manifest_content['catalogs'].copy()
-        manifest_content['catalogs'] = []
-        for catalog in catalog_order:
-            if (catalog in original_catalogs) and ((removecatalogs and catalog not in removecatalogs) or (not removecatalogs)):
-                manifest_content['catalogs'].append(catalog)
-            elif addcatalogs and catalog in addcatalogs and catalog not in manifest_content['catalogs']:
-                manifest_content['catalogs'].append(catalog)
-            elif removecatalogs and catalog in removecatalogs and catalog in manifest_content['catalogs']:
-                manifest_content['catalogs'].remove(catalog)
+        if addcatalogs or removecatalogs:
+            # Loop through the catalogs
+            manifest_content['catalogs'] = []
+            for catalog in catalog_order:
+                if (catalog in original_manifest_content['catalogs'])
+                        and ((removecatalogs and catalog not in removecatalogs)
+                             or (not removecatalogs)):
+                    manifest_content['catalogs'].append(catalog)
+                elif addcatalogs and catalog in addcatalogs and catalog not in manifest_content['catalogs']:
+                    manifest_content['catalogs'].append(catalog)
+                elif removecatalogs and catalog in removecatalogs and catalog in manifest_content['catalogs']:
+                    manifest_content['catalogs'].remove(catalog)
 
         # Add display name      
         if display_name:
@@ -194,78 +207,118 @@ def modify_manifest(serial, username, display_name, addcatalogs, removecatalogs,
                 manifest_content['notes'] = addnotes
 
         # Included manifests
-        manifest_content = remove_from_array(removemanifests, manifest_content, 'included_manifests')
-        manifest_content = add_to_array(addmanifests, manifest_content, 'included_manifests')
+        if removemanifests:
+            manifest_content = remove_from_array(removemanifests, manifest_content, 'included_manifests')
+        if addmanifests:
+            manifest_content = add_to_array(addmanifests, manifest_content, 'included_manifests')
 
         # Managed installs
-        manifest_content = remove_from_array(removeinstalls, manifest_content, 'managed_installs')
-        manifest_content = add_to_array(addinstalls, manifest_content, 'managed_installs')
+        if removeinstalls:
+            manifest_content = remove_from_array(removeinstalls, manifest_content, 'managed_installs')
+        if addinstalls:
+            manifest_content = add_to_array(addinstalls, manifest_content, 'managed_installs')
 
         # Managed uninstalls
-        manifest_content = remove_from_array(removeuninstalls, manifest_content, 'managed_uninstalls')
-        manifest_content = add_to_array(adduninstalls, manifest_content, 'managed_uninstalls')
+        if removeuninstalls:
+            manifest_content = remove_from_array(removeuninstalls, manifest_content, 'managed_uninstalls')
+        if adduninstalls:
+            manifest_content = add_to_array(adduninstalls, manifest_content, 'managed_uninstalls')
 
         # Optional installs
-        manifest_content = remove_from_array(removeoptionals, manifest_content, 'optional_installs')
-        manifest_content = add_to_array(addoptionals, manifest_content, 'optional_installs')
+        if removeoptionals:
+            manifest_content = remove_from_array(removeoptionals, manifest_content, 'optional_installs')
+        if addoptionals:
+            manifest_content = add_to_array(addoptionals, manifest_content, 'optional_installs')
 
         # Featured installs
-        manifest_content = remove_from_array(removefeatured, manifest_content, 'featured_items')
-        manifest_content = add_to_array(addfeatured, manifest_content, 'featured_items')
+        if removefeatured:
+            manifest_content = remove_from_array(removefeatured, manifest_content, 'featured_items')
+        if addfeatured:
+            manifest_content = add_to_array(addfeatured, manifest_content, 'featured_items')
 
-        # Write back manifest content to the new manifest
-        if display_name:
-            print("Writing changes back to {} for {}".format(serial, display_name))
-        else:
-            print("Writing changes back to {}".format(serial))
-        try:
-            f = open(manifest_location, 'wb')
-        except:
-            print("ERROR: Unable to open {} for writing".format(serial))
-            proceed_okay = 0
-        if proceed_okay == 1:
+        # If there were changes, Write back manifest content to the new manifest
+        if original_manifest_content != manifest_content:
+            if display_name:
+                print("Writing changes back to {} for {}".format(serial, display_name))
+            else:
+                print("Writing changes back to {}".format(serial))
             try:
-                plistlib.dump(manifest_content, f)
+                f = open(manifest_location, 'wb')
             except:
-                print("ERROR: Unable to write changes back to {} for writing".format(serial))
-        f.close()
+                print("ERROR: Unable to open {} for writing".format(serial))
+                proceed_okay = 0
+            if proceed_okay == 1:
+                try:
+                    plistlib.dump(manifest_content, f)
+                except:
+                    print("ERROR: Unable to write changes back to {} for writing".format(serial))
+            f.close()
 
 def main():
     # Get options
-    csvin, addcatalogs, removecatalogs, addmanifests, removemanifests, addnotes, addinstalls, removeinstalls, adduninstalls, removeuninstalls, addoptionals, removeoptionals, addfeatured, removefeatured = get_options()
+    csvin, every, addcatalogs, removecatalogs, addmanifests, removemanifests, addnotes, addinstalls,
+                        removeinstalls, adduninstalls, removeuninstalls, addoptionals, removeoptionals,
+                        addfeatured, removefeatured = get_options()
 
-    # Make sure the manifests directory exists and is writable
-    if os.path.isdir(manifests_directory) and os.access(manifests_directory, os.W_OK):
-        # A CSV was supplied, use that for all data.
-        if os.path.isfile(csvin):
-            try:
-                infile = open(csvin, mode='r')
-            except:
-                print("ERROR: Unable to open {}".format(csvin))
-                sys.exit(1)
-            reader = csv.reader(infile)
-            next(reader, None) # skip the header row
-            for row in reader:
-                row_count = len(row)
-                serial = row[0].upper().strip()
-                if len(serial) != 12:
-                    print("ERROR: Skipping {}, since it doesn't appear to be a serial number".format(serial))
-                    continue
-                if row_count > 1:
-                    username = row[1]
-                    if row_count > 2:
-                        display_name = row[2]
+    # CSV takes precedence over every
+    if csvin:
+        # Make sure the manifests directory exists and is writable
+        if os.path.isdir(manifests_directory):
+            # A CSV was supplied, use that for all data.
+            if os.path.isfile(csvin):
+                try:
+                    infile = open(csvin, mode='r')
+                except:
+                    print("ERROR: Unable to open {}".format(csvin))
+                    sys.exit(1)
+                reader = csv.reader(infile)
+                next(reader, None) # skip the header row
+                for row in reader:
+                    row_count = len(row)
+                    serial = row[0].upper().strip()
+                    if len(serial) != 12:
+                        print("ERROR: Skipping {}, since it doesn't appear to be a serial number".format(serial))
+                        continue
+                    if row_count > 1:
+                        username = row[1]
+                        if row_count > 2:
+                            display_name = row[2]
+                        else:
+                            display_name = False
                     else:
+                        username = False
                         display_name = False
-                else:
-                    username = False
-                    display_name = False
-                modify_manifest(serial, username, display_name, addcatalogs, removecatalogs, addmanifests, removemanifests, addnotes, addinstalls, removeinstalls, adduninstalls, removeuninstalls, addoptionals, removeoptionals, addfeatured, removefeatured)
+                    modify_manifest(serial, username, display_name, addcatalogs, removecatalogs,
+                                    addmanifests, removemanifests, addnotes, addinstalls, removeinstalls,
+                                    adduninstalls, removeuninstalls, addoptionals, removeoptionals, addfeatured,
+                                    removefeatured)
+            else:
+                print("ERROR: {} doesn't exist".format(csvin))
+                sys.exit(1)
         else:
-            print("ERROR: {} doesn't exist".format(csvin))
+            print("ERROR: {} doesn't exist".format(manifests_directory))
             sys.exit(1)
+    # If no CSV is specified, but every is, let's go with all serial manifests
+    elif every:
+        username = False
+        display_name = False
+        if os.path.isdir(manifests_directory):
+            for root, subdirs, files in os.walk(manifests_directory):
+                for file in files:
+                    # Exclude files that start with ., files that are not 12 characters long and files that
+                    # are not all uppercase
+                    if file.startswith('.') or len(file) != 12 or file.upper() != file:
+                        continue
+                    serial = file
+                    modify_manifest(serial, username, display_name, addcatalogs, removecatalogs, addmanifests,
+                                    removemanifests, addnotes, addinstalls, removeinstalls, adduninstalls,
+                                    removeuninstalls, addoptionals, removeoptionals, addfeatured, removefeatured)
+        else:
+            print("ERROR: {} doesn't exist".format(manifests_directory))
+            sys.exit(1)
+    # No CSV and no every? Error!
     else:
-        print("ERROR: {} doesn't exist or isn't writeable".format(manifests_directory))
+        print("ERROR: You must use either the --csv or --every flag")
         sys.exit(1)
 
 if __name__ == '__main__':
