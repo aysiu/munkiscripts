@@ -182,7 +182,8 @@ def modify_manifest(serial, username, display_name, addcatalogs, removecatalogs,
             # Loop through the catalogs
             manifest_content['catalogs'] = []
             for catalog in catalog_order:
-                if (catalog in original_manifest_content['catalogs'])
+                if ('catalogs' in original_manifest_content.keys()
+                    and catalog in original_manifest_content['catalogs'])
                         and ((removecatalogs and catalog not in removecatalogs)
                              or (not removecatalogs)):
                     manifest_content['catalogs'].append(catalog)
