@@ -199,8 +199,13 @@ def modify_manifest(serial, username, display_name, addcatalogs, removecatalogs,
 
         # Notes
         if addnotes:
-            if 'notes' in manifest_content.keys() and addnotes in manifest_content['notes']:
-                print("Note already exists in notes")
+            if 'notes' in manifest_content.keys():
+                if addnotes in manifest_content['notes']:
+                    print("Note already exists in notes")
+                elif manifest_content['notes'].strip() == '':
+                    manifest_content['notes'] = addnotes
+                else:
+                    manifest_content['notes'] += '\n' + addnotes
             else:
                 manifest_content['notes'] = addnotes
 
