@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>description</key>
+	<string>Enforces a screensaver idle time of 20 minutes only if the current screensaver idle time is set to Never.</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>Enforce Screensaver Idle Time</string>
+	<key>installcheck_script</key>
+	<string>#!/bin/bash
+
+# See if there's a user currently logged in
+current_user=$(/usr/bin/stat -f%Su /dev/console)
+
+# If there is no current user, let's get the last user
+if [[ -z "$current_user" ]]; then
+    target_user=$(/usr/bin/defaults read /Library/Preferences/com.apple.loginwindow lastUserName)
+else
+    # Otherwise, let's just go with the current user
+    target_user=$current_user
+fi
+
+# Initialize test variable
+current_setting=''
+
+# Just to make sure we didn't do something weird, where we get the root user or some other utility account, let's just double-check
+# the /Users/username directory exists
+if [[ -d "/Users/$target_user" ]]; then
+    # User directory exists? Probably a real user, then. Let's see what the current idleTime is set to
+    current_setting=$(/usr/bin/sudo su -l "$target_user" -c "/usr/bin/defaults -currentHost read com.apple.screensaver idleTime")
+fi
+
+
+if [[ "$current_setting" != '' ]]; then
+
+    # If it's any number 3600 or under, that's also fine, because it means it's set to something but not zero
+    if [[ "$current_setting" -gt 0 &amp;&amp; "$current_setting" -le 3600 ]]; then
+        # /bin/echo "Fine because between 1 and 3600"
+        exit 1
+    # If it's zero (or over 3600), not fine! We need to fix that
+    else
+        # /bin/echo "Not fine because 0 or over 3600"
+        exit 0
+    fi
+
+# If it's blank, that's fine, because it means we can't determine the proper user or the setting was never changed from the default idleTime.   
+else
+    # /bin/echo "Fine because blank"
+    exit 1
+fi</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>enforce_screensaver_idle_time</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/bash
+
+# See if there's a user currently logged in
+current_user=$(/usr/bin/stat -f%Su /dev/console)
+
+# If there is no current user, let's get the last user
+if [[ -z "$current_user" ]]; then
+    target_user=$(/usr/bin/defaults read /Library/Preferences/com.apple.loginwindow lastUserName)
+else
+    # Otherwise, let's just go with the current user
+    target_user=$current_user
+fi
+
+# Set the screensaver idle time to 10 minutes
+/usr/bin/sudo su -l "$target_user" -c "/usr/bin/defaults -currentHost write com.apple.screensaver idleTime 1200"
+
+# Kill all cfprefsd so the change actually takes effect
+/usr/bin/killall cfprefsd</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
