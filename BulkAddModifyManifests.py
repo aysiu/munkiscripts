@@ -182,12 +182,10 @@ def modify_manifest(serial, username, display_name, addcatalogs, removecatalogs,
             # Loop through the catalogs
             manifest_content['catalogs'] = []
             for catalog in catalog_order:
-                if 'catalogs' in original_manifest_content.keys() and catalog in original_manifest_content['catalogs']:
+                # Since we emptied out the catalogs, we don't need to remove any catalogs, just make sure we aren't re-adding
+                # those catalogs back
+                if catalog not in removecatalogs and (('catalogs' in original_manifest_content.keys() and catalog in original_manifest_content['catalogs']) or (addcatalogs and catalog in addcatalogs and catalog not in manifest_content['catalogs'])):
                     manifest_content['catalogs'].append(catalog)
-                elif addcatalogs and catalog in addcatalogs and catalog not in manifest_content['catalogs']:
-                    manifest_content['catalogs'].append(catalog)
-                elif removecatalogs and catalog in removecatalogs and catalog in manifest_content['catalogs']:
-                    manifest_content['catalogs'].remove(catalog)
 
         # Add display name      
         if display_name:
