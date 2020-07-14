@@ -4,6 +4,8 @@
 <dict>
 	<key>_metadata</key>
 	<dict>
+		<key>extranote</key>
+		<string>This is now obsolete as of Chrome 84, because Google took away the option to disable this flag</string>
 		<key>created_by</key>
 		<string>aysiu</string>
 		<key>creation_date</key>
