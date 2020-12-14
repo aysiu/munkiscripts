@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2020-12-14T08:00:00Z</date>
+		<key>munki_version</key>
+		<string>5.2.0.4237</string>
+		<key>os_version</key>
+		<string>10.15.7</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>description</key>
+	<string>Changes the calendar for root from Persian to Gregorian as a workaround for excessive notifications. This should not affect personalized locales and calendars for user accounts that are not the root account.</string>
+	<key>developer</key>
+	<string>Alan Siu</string>
+	<key>display_name</key>
+	<string>Munki Calendar Workaround</string>
+	<key>installcheck_script</key>
+	<string>#!/bin/zsh
+
+# Munki calendar check
+calendar_check=$(/usr/bin/defaults read /Library/Preferences/ManagedInstalls LastCheckDate)
+
+if [[ "$calendar_check" == "139"* || "$calendar_check" == "140"* ]]; then
+    /bin/echo "We appear to be using the Persian calendar for root."
+    exit 0
+else
+    # /bin/echo "We appear to be using the Gregorian calendar for root."
+    exit 1
+fi
+</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>munki_calendar_workaround</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/zsh
+
+# Specify calendar suffix
+calendar_suffix="@calendar=gregorian"
+
+# Get the current locale for root, removing the calendar piece if it's there
+old_locale=$(/usr/bin/defaults read /Library/Preferences/.GlobalPreferences AppleLocale | /usr/bin/awk -F "@" '{print $1}')
+
+# Write it back with the Gregorian calendar specified
+/usr/bin/defaults write /Library/Preferences/.GlobalPreferences AppleLocale "$old_locale$calendar_suffix"
+
+# Report back the change
+/bin/echo "Old locale was $old_locale; switching to $old_locale$calendar_suffix"
+
+# Report back the user-specific ones that exist and verify that they haven't changed
+for user_dir in /Users/*; do
+    if [[ -f $user_dir/Library/Preferences/.GlobalPreferences.plist ]]; then
+        key_check=$(/usr/bin/defaults read $user_dir/Library/Preferences/.GlobalPreferences | /usr/bin/grep "AppleLocale")
+        if [[ ! -z "$key_check" ]]; then
+            user_locale=$(/usr/bin/defaults read $user_dir/Library/Preferences/.GlobalPreferences AppleLocale)
+            /bin/echo "$user_dir still has $user_locale"
+        fi
+    fi
+done
+</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>unattended_uninstall</key>
+	<true/>
+	<key>uninstall_method</key>
+	<string>uninstall_script</string>
+	<key>uninstall_script</key>
+	<string>#!/bin/zsh
+
+# There isn't a real way to uninstall this
+/bin/echo "This can't be uninstalled."
+</string>
+	<key>uninstallable</key>
+	<true/>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
