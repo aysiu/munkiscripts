@@ -1,4 +1,4 @@
-#!/usr/local/munki/python
+#!/usr/local/munki/munki-python
 
 import argparse
 import copy
