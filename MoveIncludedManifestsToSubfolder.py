@@ -1,4 +1,4 @@
-#!/usr/local/munki/python
+#!/usr/local/munki/munki-python
 
 '''
 This script moves all top-level Munki manifests to the top-level of the manifests directory
