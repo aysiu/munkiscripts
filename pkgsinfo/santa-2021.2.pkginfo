@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>RestartAction</key>
+	<string>RequireRestart</string>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2021-02-04T02:05:29Z</date>
+		<key>munki_version</key>
+		<string>5.2.1.4260</string>
+		<key>os_version</key>
+		<string>10.15.7</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Security</string>
+	<key>description</key>
+	<string>Santa is a binary authorization system for macOS. It consists of a kernel extension (or a system extension on macOS 10.15+) that monitors for executions, a userland daemon that makes execution decisions based on the contents of a SQLite database, a GUI agent that notifies the user in case of a block decision and a command-line utility for managing the system and synchronizing the database with a server.
+
+It is named Santa because it keeps track of binaries that are naughty or nice.
+
+Santa is a project of Google's Macintosh Operations Team.</string>
+	<key>developer</key>
+	<string>Google</string>
+	<key>display_name</key>
+	<string>Santa</string>
+	<key>installed_size</key>
+	<integer>4916</integer>
+	<key>installer_item_hash</key>
+	<string>14500a2e0b4e94593d44d32705ece69a3a4738c0791c6dc60c011d303f439984</string>
+	<key>installer_item_location</key>
+	<string>santa-2021.2.pkg</string>
+	<key>installer_item_size</key>
+	<integer>1551</integer>
+	<key>installs</key>
+	<array>
+		<dict>
+			<key>CFBundleIdentifier</key>
+			<string>com.google.santa</string>
+			<key>CFBundleName</key>
+			<string>Santa</string>
+			<key>CFBundleShortVersionString</key>
+			<string>2021.2</string>
+			<key>CFBundleVersion</key>
+			<string>2021.2</string>
+			<key>minosversion</key>
+			<string>10.9</string>
+			<key>path</key>
+			<string>/Applications/Santa.app</string>
+			<key>type</key>
+			<string>application</string>
+			<key>version_comparison_key</key>
+			<string>CFBundleShortVersionString</string>
+		</dict>
+		<dict>
+			<key>md5checksum</key>
+			<string>3abf4c2c231231afed4ec3c93574b1bd</string>
+			<key>path</key>
+			<string>/Library/LaunchDaemons/com.google.santa.bundleservice.plist</string>
+			<key>type</key>
+			<string>file</string>
+		</dict>
+	</array>
+	<key>minimum_os_version</key>
+	<string>10.5.0</string>
+	<key>name</key>
+	<string>santa</string>
+	<key>receipts</key>
+	<array>
+		<dict>
+			<key>installed_size</key>
+			<integer>4916</integer>
+			<key>packageid</key>
+			<string>com.google.santa</string>
+			<key>version</key>
+			<string>2021.2</string>
+		</dict>
+	</array>
+	<key>unattended_install</key>
+	<true/>
+	<key>unattended_uninstall</key>
+	<true/>
+	<key>uninstall_method</key>
+	<string>uninstall_script</string>
+	<key>uninstall_script</key>
+	<string>#!/bin/zsh
+
+# Modified version of https://github.com/google/santa/blob/main/Conf/uninstall.sh
+
+# Define variables
+santabin=/Applications/Santa.app/Contents/MacOS/Santa
+downloadurl='https://github.com/google/santa/releases/download/2021.2/santa-2021.2.tar.gz'
+targz=/tmp/santa.tar.gz
+desiredmd5='a5ee809bbc8ef5c607c6970b31ec5c59'
+untarred='/tmp/santa-2021.2'
+
+# We have to use a GUI prompt to unload the system extension. If you try unload it via
+# systemextensionsctl uninstall EQHXZ8M8AV com.google.santa.daemon
+# you'll get this message:
+### At this time, this tool cannot be used if System Integrity Protection is enabled.
+### This limitation will be removed in the near future.
+### Please remember to re-enable System Integrity Protection!
+
+# See if the system extension is still enabled
+sysexttest=$(/usr/bin/systemextensionsctl list | /usr/bin/grep "com.google.santa.daemon" | /usr/bin/grep "activated enabled")
+if [[ ! -z "$sysexttest" ]]; then
+    # If Munki tried to uninstall Santa before but the user didn't authenticate in the GUI dialogue, the Santa binary may not exist any more, so we have to double-check it exists
+    if [[ ! -f $santabin ]]; then
+        /bin/echo "Downloading Santa so we can unload the system extension"
+        /usr/bin/curl -s -L -o $targz $downloadurl
+        if [[ ! -f $targz ]]; then
+            /bin/echo "ERROR: Unable to download Santa. Exiting..."
+            exit 1
+        fi
+        /bin/echo "Verifying integrity of Santa download."
+        actualmd5=$(/sbin/md5 -q $targz)
+        if [[ "$actualmd5" != "$desiredmd5" ]]; then
+            /bin/echo "ERROR: Cannot verify integrity of Santa download. Exiting..."
+            exit 1
+        fi
+        /bin/echo "Extracting compressed $targz"
+        /usr/bin/tar -xvf $targz -C /tmp/
+        tmpsantabin=$untarred/binaries/Santa.app
+        if [[ ! -d $tmpsantabin ]]; then
+            /bin/echo "ERROR: $tmpsantabin doesn't exist, even after extraction. Exiting..."
+            exit 1
+        fi
+        /bin/echo "Copying $tmpsantabin to the /Applications folder."
+        /bin/cp -R $tmpsantabin /Applications/
+    fi
+    # For macOS 10.15+ this will block up to 60 seconds
+    /bin/echo "Trying to unload system extension..."
+    /bin/launchctl list EQHXZ8M8AV.com.google.santa.daemon &gt; /dev/null 2&gt;&amp;1 &amp;&amp; /Applications/Santa.app/Contents/MacOS/Santa --unload-system-extension
+fi
+
+/bin/launchctl remove com.google.santad
+sleep 1
+/sbin/kextunload -b com.google.santa-driver &gt;/dev/null 2&gt;&amp;1
+user=$(/usr/bin/stat -f '%u' /dev/console)
+[[ -n "$user" ]] &amp;&amp; /bin/launchctl asuser ${user} /bin/launchctl remove com.google.santagui
+[[ -n "$user" ]] &amp;&amp; /bin/launchctl asuser ${user} /bin/launchctl remove com.google.santa
+# and to clean out the log config, although it won't write after wiping the binary
+/usr/bin/killall -HUP syslogd
+# delete artifacts on-disk
+
+removaldirs=(
+    '/Applications/Santa.app'
+    '/Library/Extensions/santa-driver.kext'
+)
+
+removalfiles=(
+    '/Library/LaunchAgents/com.google.santagui.plist'
+    '/Library/LaunchAgents/com.google.santa.plist'
+    '/Library/LaunchDaemons/com.google.santad.plist'
+    '/Library/LaunchDaemons/com.google.santa.bundleservice.plist'
+    '/private/etc/asl/com.google.santa.asl.conf'
+    '/private/etc/newsyslog.d/com.google.santa.newsyslog.conf'
+    '/usr/local/bin/santactl' # just a symlink
+)
+
+for removaldir in $removaldirs; do
+    if [[ -a $removaldir ]]; then
+        /bin/echo "Removing $removaldir"
+        /bin/rm -rf $removaldir
+    fi
+done
+
+for removalfile in $removalfiles; do
+    if [[ -f $removalfile ]]; then
+        /bin/echo "Removing $removalfile"
+        /bin/rm -f $removalfile
+    fi
+done
+
+#uncomment to remove the config file and all databases, log files
+#/bin/rm -rf /var/db/santa
+#/bin/rm -f /var/log/santa*
+exit 0
+</string>
+	<key>uninstallable</key>
+	<true/>
+	<key>uninstallcheck_script</key>
+	<string>#!/bin/zsh
+
+# See if the system extension is still enabled
+sysexttest=$(/usr/bin/systemextensionsctl list | /usr/bin/grep "com.google.santa.daemon" | /usr/bin/grep "activated enabled")
+
+if [[ -z "$sysexttest" ]]; then
+    /bin/echo "Santa system extension unloaded."
+    exit 1
+else
+    /bin/echo "Santa system extension still loaded. Santa still needs to be uninstalled."
+    exit 0
+fi
+</string>
+	<key>version</key>
+	<string>2021.2</string>
+</dict>
+</plist>
