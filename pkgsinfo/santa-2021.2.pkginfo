@@ -192,7 +192,7 @@ exit 0
 	<string>#!/bin/zsh
 
 # See if the system extension is still enabled
-sysexttest=$(/usr/bin/systemextensionsctl list | /usr/bin/grep "com.google.santa.daemon" | /usr/bin/grep "activated enabled")
+sysexttest=$(/usr/bin/systemextensionsctl list | /usr/bin/grep "com.google.santa.daemon")
 
 if [[ -z "$sysexttest" ]]; then
     /bin/echo "Santa system extension unloaded."
