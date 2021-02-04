@@ -86,9 +86,9 @@ Santa is a project of Google's Macintosh Operations Team.</string>
 		</dict>
 	</array>
 	<key>unattended_install</key>
-	<true/>
+	<false/>
 	<key>unattended_uninstall</key>
-	<true/>
+	<false/>
 	<key>uninstall_method</key>
 	<string>uninstall_script</string>
 	<key>uninstall_script</key>
