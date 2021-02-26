@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2021-02-26T01:30:04Z</date>
+		<key>munki_version</key>
+		<string>5.2.2.4286</string>
+		<key>os_version</key>
+		<string>11.2.1</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>description</key>
+	<string>Checks to see if a particular OS build (or higher) is installed, and opens up System Preferences &gt; Software Update if not yet installed.</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>Latest Build</string>
+	<key>installcheck_script</key>
+	<string>#!/usr/local/munki/munki-python
+
+from distutils.version import LooseVersion
+from subprocess import Popen, PIPE
+from sys import exit
+from SystemConfiguration import SCDynamicStoreCopyConsoleUser
+
+# This is the desired build
+desired_build = '20D74'
+
+# If these are the "current" users, then no real user is logged in
+not_users = ['', 'root', '_mbsetupuser']
+
+def main():
+
+    # Get the currently logged in user
+    username = (SCDynamicStoreCopyConsoleUser(None, None, None) or [None])[0]
+    username = [username,""][username in [u"loginwindow", None, u""]]
+
+    # If no user is logged in, we might as well consider this installed, since we aren't going to launch up System Preferences from the login window
+    if username in not_users:
+        print('No user is logged in. Considering "installed" for now.')
+        exit(1)
+
+    # Get the current build
+    cmd = ['/usr/bin/sw_vers', '-buildVersion']
+    p = Popen(cmd, stdout=PIPE, stderr=PIPE, encoding='utf8')
+    out, err = p.communicate()
+    # There shouldn't be a problem getting the current build, but if there is, consider this installed for now, and then maybe it will work again later.
+    if err:
+        print('Error trying to determine OS build: {}. Considering "installed" for now.'.format(err))
+        exit(1)
+    os_build = out.strip()
+    # If it's already the desired build or higher, it's installed.
+    if LooseVersion(os_build) &gt;= LooseVersion(desired_build):
+        print('{} is already {} or higher'.format(os_build, desired_build))
+        exit(1)
+    # If it's not yet the desired build, it's not installed.
+    else:
+        print('{} is not yet the current build. The current build is {}'.format(desired_build, os_build))
+        exit(0)
+
+if __name__ == "__main__":
+    main()
+</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>latest_build</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/zsh
+
+# Get the currently logged in user
+current_user=$(stat -f %Su /dev/console)
+
+# Make sure the user is a real user
+if [[ "$current_user" != "root" &amp;&amp; "$current_user" != "" &amp;&amp; "$current_user" != "_mbsetupuser" ]]; then
+    /bin/echo "$current_user is logged in, so launching up System Preferences &gt; Software Update"
+    # Launch up System Preferences
+    /usr/bin/su -l "$current_user" -c "open /System/Library/PreferencePanes/SoftwareUpdate.prefPane"
+fi
+</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>unattended_uninstall</key>
+	<true/>
+	<key>uninstall_method</key>
+	<string>uninstall_script</string>
+	<key>uninstall_script</key>
+	<string>#!/bin/zsh
+
+/bin/echo "This can't really be uninstalled, but just adding an uninstall script in case it's an update for another Munki item"
+</string>
+	<key>uninstallable</key>
+	<true/>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
