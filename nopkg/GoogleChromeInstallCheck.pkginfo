@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2021-03-04T17:10:42Z</date>
+		<key>munki_version</key>
+		<string>5.2.2.4286</string>
+		<key>os_version</key>
+		<string>11.2.2</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Web Browsers</string>
+	<key>description</key>
+	<string>Chrome is a fast, simple, and secure web browser, built for the modern web.</string>
+	<key>developer</key>
+	<string>Google</string>
+	<key>display_name</key>
+	<string>Google Chrome</string>
+	<key>installcheck_script</key>
+	<string>#!/usr/local/munki/munki-python
+
+# Adapted from https://github.com/grahamgilbert/chrome_update_notifier/blob/master/payload/Library/Management/chrome_update_notifier.py
+
+from distutils.version import LooseVersion
+import os
+import plistlib
+import subprocess
+import sys
+
+desired_chrome_version = '89.0.4389.72'
+chrome_plist = '/Applications/Google Chrome.app/Contents/Info.plist'
+
+def chrome_installed():
+    """
+    Checks if Google Chrome is installed
+    """
+    return bool(os.path.exists(chrome_plist))
+
+def get_chrome_version():
+    """
+    Returns the on disk chrome version
+    """
+    try:
+        chrome_contents = open(chrome_plist, 'r+b')
+    except:
+        print('ERROR: Unable to open {}, so cannot determine Chrome version. Considering not installed'.format(chrome_plist))
+        sys.exit(0)
+    try:
+        chrome_info = plistlib.load(chrome_contents)
+    except:
+        print('ERROR: Unable to get version from {}. Considering not installed.'.format(chrome_plist))
+    if 'CFBundleShortVersionString' in chrome_info:
+        return chrome_info['CFBundleShortVersionString']
+    else:
+        return '0'
+
+def running_chrome_version():
+    proc = subprocess.Popen(['/bin/ps', '-axo' 'command='],
+                            shell=False, stdin=subprocess.PIPE,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE, encoding='utf8')
+    (output, dummy_err) = proc.communicate()
+    if proc.returncode == 0:
+        proc_lines = [item for item in output.splitlines()]
+        for line in proc_lines:
+            if line.startswith('/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/'):
+                line = line.replace('/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/', '')
+                if line:
+                    sep = '/'
+                    line = line.split(sep, 1)[0]
+                    return line
+
+def main():
+
+    if not chrome_installed():
+        print('Chrome not installed')
+        sys.exit(0)
+
+    current_chrome_version = get_chrome_version()
+
+    if current_chrome_version == '0':
+        print('Could not get current chrome version')
+        sys.exit(0)
+
+    if LooseVersion(current_chrome_version) &lt; LooseVersion(desired_chrome_version):
+        print('Chrome {} is installed and should be {}'.format(current_chrome_version, desired_chrome_version))
+        sys.exit(0)
+
+    running_version = running_chrome_version()
+    if not running_version:
+        print('Chrome is not running and seems up to date')
+        sys.exit(1)
+    elif LooseVersion(running_version) &lt; LooseVersion(current_chrome_version):
+        print('Running version is {} and on-disk version is {}'.format(running_version, current_chrome_version))
+        sys.exit(0)
+
+    print('Chrome is running and is up to date')
+    sys.exit(1)
+
+if __name__ == '__main__':
+    main()
+</string>
+	<key>installer_item_hash</key>
+	<string>048079f2c45861779dffb29731998555e542d54eab4ec7b3a1a6b4a0a2f0d570</string>
+	<key>installer_item_location</key>
+	<string>apps/GoogleChrome-89.0.4389.72.dmg</string>
+	<key>installer_item_size</key>
+	<integer>181253</integer>
+	<key>installer_type</key>
+	<string>copy_from_dmg</string>
+	<key>installs</key>
+	<array>
+		<dict>
+			<key>CFBundleIdentifier</key>
+			<string>com.google.Chrome</string>
+			<key>CFBundleName</key>
+			<string>Chrome</string>
+			<key>CFBundleShortVersionString</key>
+			<string>89.0.4389.72</string>
+			<key>CFBundleVersion</key>
+			<string>4389.72</string>
+			<key>minosversion</key>
+			<string>10.11.0</string>
+			<key>path</key>
+			<string>/Applications/Google Chrome.app</string>
+			<key>type</key>
+			<string>application</string>
+			<key>version_comparison_key</key>
+			<string>CFBundleShortVersionString</string>
+		</dict>
+	</array>
+	<key>items_to_copy</key>
+	<array>
+		<dict>
+			<key>destination_path</key>
+			<string>/Applications</string>
+			<key>source_item</key>
+			<string>Google Chrome.app</string>
+		</dict>
+	</array>
+	<key>minimum_os_version</key>
+	<string>10.11.0</string>
+	<key>name</key>
+	<string>GoogleChrome</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>uninstall_method</key>
+	<string>remove_copied_items</string>
+	<key>uninstallable</key>
+	<true/>
+	<key>version</key>
+	<string>89.0.4389.72</string>
+</dict>
+</plist>
