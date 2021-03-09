@@ -93,7 +93,7 @@ if [[ "$current_user" != "root" &amp;&amp; "$current_user" != "" &amp;&amp; "$cu
 fi
 </string>
 	<key>unattended_install</key>
-	<true/>
+	<false/>
 	<key>unattended_uninstall</key>
 	<true/>
 	<key>uninstall_method</key>
