@@ -36,7 +36,7 @@ from sys import exit
 from SystemConfiguration import SCDynamicStoreCopyConsoleUser
 
 # This is the desired build
-desired_build = '20D74'
+desired_build = '20D91'
 
 # If these are the "current" users, then no real user is logged in
 not_users = ['', 'root', '_mbsetupuser']
