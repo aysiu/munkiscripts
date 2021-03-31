@@ -101,8 +101,8 @@ def main():
     if not running_version:
         print('Chrome is not running and seems up to date')
         sys.exit(1)
-    elif LooseVersion(running_version) &lt; LooseVersion(current_chrome_version):
-        print('Running version is {} and on-disk version is {}'.format(running_version, current_chrome_version))
+    elif LooseVersion(running_version) &lt; LooseVersion(desired_chrome_version):
+        print('Running version is {} and desired version is {}'.format(running_version, desired_chrome_version))
         sys.exit(0)
 
     print('Chrome is running and is up to date')
