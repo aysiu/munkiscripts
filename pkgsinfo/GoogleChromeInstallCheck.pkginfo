@@ -59,7 +59,8 @@ def get_chrome_version():
     try:
         chrome_info = plistlib.load(chrome_contents)
     except:
-        print('ERROR: Unable to get version from {}. Considering not installed.'.format(chrome_plist))
+        print('ERROR: Unable to get plist contents from {}. Considering not installed.'.format(chrome_plist))
+        sys.exit(0)
     if 'CFBundleShortVersionString' in chrome_info:
         return chrome_info['CFBundleShortVersionString']
     else:
