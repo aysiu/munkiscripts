@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>_metadata</key>
+	<dict>
+		<key>created_by</key>
+		<string>aysiu</string>
+		<key>creation_date</key>
+		<date>2021-04-02T03:23:58Z</date>
+		<key>munki_version</key>
+		<string>5.2.2.4286</string>
+		<key>os_version</key>
+		<string>11.2.3</string>
+	</dict>
+	<key>autoremove</key>
+	<false/>
+	<key>catalogs</key>
+	<array>
+		<string>testing</string>
+	</array>
+	<key>category</key>
+	<string>Scripts</string>
+	<key>description</key>
+	<string>Enables SSH by loading the SSH launch daemon.</string>
+	<key>developer</key>
+	<string>aysiu</string>
+	<key>display_name</key>
+	<string>Enable SSH</string>
+	<key>installcheck_script</key>
+	<string>#!/bin/zsh
+
+ssh_ld_test=$(/bin/launchctl list | /usr/bin/grep "com.openssh.sshd")
+
+if [[ -z "$ssh_ld_test" ]]; then
+    /bin/echo "SSH is disabled. Not installed..."
+    exit 0
+else
+    /bin/echo "SSH is enabled. Installed..."
+    exit 1
+fi
+</string>
+	<key>installer_type</key>
+	<string>nopkg</string>
+	<key>minimum_os_version</key>
+	<string>10.4.0</string>
+	<key>name</key>
+	<string>enable_ssh</string>
+	<key>postinstall_script</key>
+	<string>#!/bin/zsh
+
+# /usr/sbin/systemsetup -f -setremotelogin on leads to a PPPC/TCC error
+# setremotelogin: Turning Remote Login on or off requires Full Disk Access privileges
+# So, loading the SSH launch daemon instead
+/bin/launchctl load -w /System/Library/LaunchDaemons/ssh.plist
+</string>
+	<key>unattended_install</key>
+	<true/>
+	<key>unattended_uninstall</key>
+	<true/>
+	<key>uninstall_method</key>
+	<string>uninstall_script</string>
+	<key>uninstall_script</key>
+	<string>#!/bin/zsh
+
+# /usr/sbin/systemsetup -f -setremotelogin off leads to a PPPC/TCC error
+# setremotelogin: Turning Remote Login on or off requires Full Disk Access privileges
+# So, unloading the SSH launch daemon instead
+/bin/launchctl unload -w /System/Library/LaunchDaemons/ssh.plist
+</string>
+	<key>uninstallable</key>
+	<true/>
+	<key>version</key>
+	<string>1.0</string>
+</dict>
+</plist>
