@@ -158,7 +158,12 @@ if __name__ == '__main__':
 	<string>#!/bin/zsh
 
 # Since the installcheck_script checks for the running version of Chrome, kill any existing (stray) Chrome processes, as Munki may end up in an install loop otherwise. Blocking applications based on the installs array means Chrome should already not be running.
-/usr/bin/killall "Google Chrome"
+stray_chrome=$(/bin/ps -axo command= | /usr/bin/grep "Google Chrome" | /usr/bin/grep -v "grep")
+
+if [[ ! -z "$stray_chrome" ]]; then
+    /bin/echo "There was at least one stray Chrome process, so killing Chrome"
+    /usr/bin/killall "Google Chrome"
+fi
 </string>
 	<key>unattended_install</key>
 	<true/>
