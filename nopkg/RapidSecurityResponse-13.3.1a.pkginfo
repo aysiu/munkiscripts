@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>catalogs</key>
+    <array>
+        <string>testing</string>
+    </array>
+    <key>description</key>
+    <string>Rapid Security Responses deliver important security improvements between software updates. They deliver important security improvements between software updates — for example, improvements to the Safari web browser, the WebKit framework stack, or other critical system libraries. They may also be used to mitigate some security issues more quickly, such as issues that might have been exploited or reported to exist "in the wild."
+
+More details in https://support.apple.com/en-us/HT201224</string>
+    <key>display_name</key>
+    <string>Rapid Security Response</string>
+    <key>installcheck_script</key>
+    <string>#!/bin/zsh
+
+# Define desired extra "version"
+desired_extra='(a)'
+
+# Get the current extra version, if it even exists...
+current_extra=$(/usr/bin/sw_vers -productVersionExtra)
+
+# If the result is empty, consider not installed
+if [[ -z "$current_extra" ]]; then
+    /bin/echo "ProductVersionExtra is missing and should be $desired_extra"
+    exit 0
+# If it's present but the wrong version, then consider not installed
+elif [[ "$current_extra" != "$desired_extra" ]]; then
+    /bin/echo "ProductVersionExtra is currently $current_extra and should be $desired_extra"
+    exit 0
+# Otherwise, consider installed
+else
+    /bin/echo "ProductVersionExtra is already $desired_extra"
+    exit 1
+fi
+</string>
+    <key>installer_type</key>
+    <string>nopkg</string>
+    <key>maximum_os_version</key>
+    <string>13.3.1</string>
+    <key>minimum_os_version</key>
+    <string>13.3.1</string>
+    <key>name</key>
+    <string>RapidSecurityResponse</string>
+    <key>postinstall_script</key>
+    <string>#!/bin/zsh
+
+/bin/echo "Opening Software Update in System Settings..."
+open /System/Library/PreferencePanes/SoftwareUpdate.prefPane
+</string>
+    <key>unattended_install</key>
+    <false/>
+    <key>uninstallable</key>
+    <false/>
+    <key>version</key>
+    <string>13.3.1 (a)</string>
+</dict>
+</plist>
