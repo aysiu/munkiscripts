@@ -18,6 +18,13 @@ More details in https://support.apple.com/en-us/HT201224</string>
 # Define desired extra "version"
 desired_extra='(a)'
 
+# Make sure a real user is logged in
+loggedin_user="$(/usr/bin/stat -f%Su /dev/console)"
+if [[ $loggedin_user == "" || $loggedin_user == "root" || $loggedin_user == "_mbsetupuser" ]]; then
+    /bin/echo "No real user account logged in, so considering installed for now"
+    exit 1
+fi
+
 # Get the current extra version, if it even exists...
 current_extra=$(/usr/bin/sw_vers -productVersionExtra)
 
