@@ -32,11 +32,17 @@
 
 # Adapted from https://github.com/grahamgilbert/chrome_update_notifier/blob/master/payload/Library/Management/chrome_update_notifier.py
 
-from distutils.version import LooseVersion
 import os
 import plistlib
 import subprocess
 import sys
+
+sys.path.insert(0, "/usr/local/munki")
+from munkilib.pkgutils import MunkiLooseVersion
+
+# Exit codes
+PROCEED_WITH_INSTALL = 0
+INSTALL_NOT_NEEDED = 1
 
 desired_chrome_version = '89.0.4389.72'
 chrome_plist = '/Applications/Google Chrome.app/Contents/Info.plist'
@@ -55,12 +61,12 @@ def get_chrome_version():
         chrome_contents = open(chrome_plist, 'r+b')
     except:
         print('ERROR: Unable to open {}, so cannot determine Chrome version. Considering not installed'.format(chrome_plist))
-        sys.exit(0)
+        sys.exit(PROCEED_WITH_INSTALL)
     try:
         chrome_info = plistlib.load(chrome_contents)
     except:
         print('ERROR: Unable to get plist contents from {}. Considering not installed.'.format(chrome_plist))
-        sys.exit(0)
+        sys.exit(PROCEED_WITH_INSTALL)
     if 'CFBundleShortVersionString' in chrome_info:
         return chrome_info['CFBundleShortVersionString']
     else:
@@ -86,28 +92,28 @@ def main():
 
     if not chrome_installed():
         print('Chrome not installed')
-        sys.exit(0)
+        sys.exit(PROCEED_WITH_INSTALL)
 
     current_chrome_version = get_chrome_version()
 
     if current_chrome_version == '0':
         print('Could not get current chrome version')
-        sys.exit(0)
+        sys.exit(PROCEED_WITH_INSTALL)
 
-    if LooseVersion(current_chrome_version) &lt; LooseVersion(desired_chrome_version):
+    if MunkiLooseVersion(current_chrome_version) &lt; MunkiLooseVersion(desired_chrome_version):
         print('Chrome {} is installed and should be {}'.format(current_chrome_version, desired_chrome_version))
-        sys.exit(0)
+        sys.exit(PROCEED_WITH_INSTALL)
 
     running_version = running_chrome_version()
     if not running_version:
         print('Chrome is not running and seems up to date')
-        sys.exit(1)
-    elif LooseVersion(running_version) &lt; LooseVersion(desired_chrome_version):
+        sys.exit(INSTALL_NOT_NEEDED)
+    elif MunkiLooseVersion(running_version) &lt; MunkiLooseVersion(desired_chrome_version):
         print('Running version is {} and desired version is {}'.format(running_version, desired_chrome_version))
-        sys.exit(0)
+        sys.exit(PROCEED_WITH_INSTALL)
 
     print('Chrome is running and is up to date')
-    sys.exit(1)
+    sys.exit(INSTALL_NOT_NEEDED)
 
 if __name__ == '__main__':
     main()
