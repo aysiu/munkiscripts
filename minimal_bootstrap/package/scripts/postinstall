@@ -1,0 +1,33 @@
+#!/bin/zsh
+
+munki_installer=/private/tmp/munkitools-6.6.3.4704.pkg
+url_test="SoftwareRepoURL: 'https://YOURORG.COM/munki_repo'"
+managedsoftwareupdate=/usr/local/munki/managedsoftwareupdate
+
+if [[ ! -f $munki_installer ]]; then
+    /bin/echo "ERROR: $munki_installer missing!"
+    exit 1
+fi
+
+/bin/echo "Installing $munki_installer..."
+/usr/sbin/installer -pkg $munki_installer -target /
+
+if [[ ! -f $managedsoftwareupdate ]]; then
+    /bin/echo "ERROR: Even though Munki installed, $managedsoftwareupdate is missing!"
+    exit 1
+fi
+
+# Presumably, the MDM would send down a configuration profile to set the Munki settings
+/bin/echo "Waiting for Munki settings..."
+while ! /usr/local/munki/managedsoftwareupdate --show-config | /usr/bin/grep "$url_test"; do
+    /bin/echo "$url_test not present yet. Waiting..."
+    /bin/sleep 2
+done
+
+/bin/echo "$url_test now present!"
+
+/bin/echo "Setting Munki bootstrap mode..."
+/usr/local/munki/managedsoftwareupdate --set-bootstrap-mode
+
+/bin/echo "Logging out..."
+/usr/bin/osascript -e 'tell app "loginwindow" to  «event aevtrlgo»'
