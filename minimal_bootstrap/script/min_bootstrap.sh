@@ -1,9 +1,24 @@
 #!/bin/zsh
 
+# Maximum minutes to wait until SoftwareRepoURL set
+max_waiting_minutes=5
+
+# Convert minutes to seconds
+max_waiting_seconds=$((max_waiting_minutes * 60))
+
+# URL of Munki installer to download
 munki_installer='https://github.com/macadmins/munki-builds/releases/download/v6.6.5.4711/munkitools-6.6.5.4711.pkg'
+
+# Where to download the installer to
 installer_location=/private/tmp/munkitools.pkg
+
+# md5 checksum for downloaded installer
 installer_checksum='4ce74641ba15b2b067d1863886c34f14'
+
+# Line you expect to get back from SoftwareRepoURL setting
 url_test="SoftwareRepoURL: 'http://localhost/munki_repo'"
+
+# Location of the managedsoftwareupdate command
 managedsoftwareupdate=/usr/local/munki/managedsoftwareupdate
 
 /bin/echo "Fetching Munki installer..."
@@ -29,11 +44,18 @@ if [[ ! -f $managedsoftwareupdate ]]; then
     exit 1
 fi
 
+counter=2
+
 # Presumably, the MDM would send down a configuration profile to set the Munki settings
 /bin/echo "Waiting for Munki settings..."
 while ! /usr/local/munki/managedsoftwareupdate --show-config | /usr/bin/grep "$url_test"; do
-    /bin/echo "$url_test not present yet. Waiting..."
+    if [[ $counter -gt $max_waiting_seconds ]]; then
+    	/bin/echo "ERROR: Waited more than $max_waiting_seconds for $url_test. Giving up..."
+    	exit 1
+    fi
+    /bin/echo "$url_test not present yet. Waited $counter seconds so far..."
     /bin/sleep 2
+    counter=$((counter + 2))
 done
 
 /bin/echo "$url_test now present!"
