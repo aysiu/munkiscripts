@@ -10,5 +10,7 @@ You may be using Munki to update itself, so you may not need to have this initia
 
 If you update the version, you'll also need to modify `installer_checksum='114a54c00a160eba6bff4e3590d065ad'` to be the actual md5 checksum of the downloaded .pkg (you can find it by running `md5 -q /PATH/TO/munkitools-VERSION.pkg`.
 
+By default, the `min_bootstrap.sh` script will wait up to three minutes for the URL to get set, and then the script will give up. You can change `max_waiting_minutes` to a higher or lower minute value if you want.
+
 ### Disclaimer
 I don't use this myself. I just created it because I thought it might be helpful to others who are trying to bootstrap Munki. No warranty or support explicit or implied.
