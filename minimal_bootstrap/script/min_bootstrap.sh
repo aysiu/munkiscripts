@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 # Maximum minutes to wait until SoftwareRepoURL set
-max_waiting_minutes=5
+max_waiting_minutes=3
 
 # Convert minutes to seconds
 max_waiting_seconds=$((max_waiting_minutes * 60))
