@@ -28,7 +28,8 @@ if [[ ! -f $managedsoftwareupdate ]]; then
     exit 1
 fi
 
-counter=2
+# Initialize counter in seconds waited
+counter=0
 
 # Presumably, the MDM would send down a configuration profile to set the Munki settings
 /bin/echo "Waiting for Munki settings..."
