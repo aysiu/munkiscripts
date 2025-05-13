@@ -38,9 +38,9 @@ while ! /usr/local/munki/managedsoftwareupdate --show-config | /usr/bin/grep "$u
     	/bin/echo "ERROR: Waited more than $max_waiting_seconds for $url_test. Giving up..."
     	exit 1
     fi
-    /bin/echo "$url_test not present yet. Waited $counter seconds so far..."
     /bin/sleep 2
     counter=$((counter + 2))
+    /bin/echo "$url_test not present yet. Waited $counter seconds so far..."
 done
 
 /bin/echo "$url_test now present!"
