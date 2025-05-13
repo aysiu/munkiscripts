@@ -1,8 +1,8 @@
 #!/bin/zsh
 
-munki_installer='https://github.com/macadmins/munki-builds/releases/download/v6.6.3.4704/munkitools-6.6.3.4704.pkg'
+munki_installer='https://github.com/macadmins/munki-builds/releases/download/v6.6.5.4711/munkitools-6.6.5.4711.pkg'
 installer_location=/private/tmp/munkitools.pkg
-installer_checksum='114a54c00a160eba6bff4e3590d065ad'
+installer_checksum='4ce74641ba15b2b067d1863886c34f14'
 url_test="SoftwareRepoURL: 'http://localhost/munki_repo'"
 managedsoftwareupdate=/usr/local/munki/managedsoftwareupdate
 
