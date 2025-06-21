@@ -1,0 +1,55 @@
+#!/bin/zsh
+
+##########################################################################################
+### These are just sample old names and new names. Substitute in whatever you actually ###
+### want to replace ######################################################################
+##########################################################################################
+
+# Former name of item
+old_name="Homebrew"
+
+# New name of item
+new_name="Workbrew"
+
+##########################################################################################
+##########################################################################################
+
+# Location of SelfServeManifest
+self_serve_manifest="/Library/Managed Installs/manifests/SelfServeManifest"
+
+if [[ ! -f $self_serve_manifest ]]; then
+	echo "$self_serve_manifest doesn't exist. No update needed."
+	exit 0
+fi
+
+# Initialize counter to loop through array
+counter=0
+# Set test variable to see if a change is needed
+update_needed=false
+
+# Start loop
+while true; do
+	# Try to get the 0th, 1st, 2nd, etc. managed install
+	managed_install=$(/usr/libexec/PlistBuddy -c "Print :managed_installs:$counter" $self_serve_manifest 2>&-)
+	# If we can't get it, break out of the loop
+	if [[ -z $managed_install ]]; then
+		break
+	else
+		echo "Examining $managed_install..."
+		# If the managed install is the old name, delete it
+		if [[ $managed_install == $old_name ]]; then
+			echo "Deleting $old_name from $self_serve_manifest..."
+			/usr/libexec/PlistBuddy -c "Delete :managed_installs:$counter" $self_serve_manifest
+			update_needed=true
+		fi
+		(( counter++ ))
+	fi
+done
+
+# If we deleted the old name, let's add the new name
+if $update_needed; then
+	echo "Adding $new_name to $self_serve_manifest..."
+	/usr/libexec/PlistBuddy -c "Add :managed_installs:$counter string \"$new_name\"" $self_serve_manifest
+else
+	echo "Didn't find $old_name. No update needed."
+fi
