@@ -8,5 +8,6 @@ Update the postinstall script's variables at the top to reflect the old item nam
 Use [https://github.com/munki/munki-pkg](munkipkg) to create the package.
 
 Example: `munkipkg ~/Downloads/munkiscripts/update_selfservemanifest_item`
+(Use the actual path, which may or may not be in the `~/Downloads` folder.)
 
 You can then import the newly built "package" into your Munki repo to distribute to your client Macs.
