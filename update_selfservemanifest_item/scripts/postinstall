@@ -29,11 +29,14 @@ update_needed=false
 
 # Start loop
 while true; do
+	# Try to get the 0th, 1st, 2nd, etc. managed install
 	managed_install=$(/usr/libexec/PlistBuddy -c "Print :managed_installs:$counter" $self_serve_manifest 2>&-)
+	# If we can't get it, break out of the loop
 	if [[ -z $managed_install ]]; then
 		break
 	else
 		echo "Examining $managed_install..."
+		# If the managed install is the old name, delete it
 		if [[ $managed_install == $old_name ]]; then
 			echo "Deleting $old_name from $self_serve_manifest..."
 			/usr/libexec/PlistBuddy -c "Delete :managed_installs:$counter" $self_serve_manifest
@@ -43,6 +46,7 @@ while true; do
 	fi
 done
 
+# If we deleted the old name, let's add the new name
 if $update_needed; then
 	echo "Adding $new_name to $self_serve_manifest..."
 	/usr/libexec/PlistBuddy -c "Add :managed_installs:$counter string \"$new_name\"" $self_serve_manifest
