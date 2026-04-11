@@ -1,0 +1,18 @@
+#!/bin/zsh
+
+dock_script='/usr/local/outset/login-once/gimp_dock.py'
+
+current_user=$(stat -f %Su /dev/console)
+
+# If there's a user account logged in...
+if [[ $current_user != 'root' && $current_user != 'loginwindow' && $current_user != '_mbsetupuser' && ! -z $current_user ]]; then
+    # ... let's go ahead and run the script
+    /bin/echo "Running $dock_script as $current_user..."
+    /usr/bin/su -l $current_user -c "$dock_script"
+    # If the command to run the script executes without error...
+    if [[ $? == 0 ]]; then
+        # ... let's go ahead and delete the script, so Outset doesn't run it at next login
+        /bin/echo "Removing $dock_script..."
+        /bin/rm "$dock_script"
+    fi
+fi
